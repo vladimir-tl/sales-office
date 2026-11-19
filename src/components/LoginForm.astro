@@ -1,6 +1,6 @@
 ---
-const apiUrl = (import.meta.env.PUBLIC_API_URL ?? 'https://backend.tallinn-learning.ee').replace(/\/$/, '');
-const endpoint = `${apiUrl}/login/auth`;
+// Same-origin proxy (src/pages/api/login/auth.ts) forwards to the backend POST /login/student
+const endpoint = '/api/login/auth';
 ---
 
 <div class="login">

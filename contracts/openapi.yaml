@@ -5,7 +5,8 @@ info:
   description: |
     Backend contract used by the Sales Office frontend.
 
-    * All data endpoints require a JWT from `POST /login/auth`, sent as `Authorization: Bearer <token>`.
+    * All data endpoints require a JWT from `POST /login/student`, sent as `Authorization: Bearer <token>`.
+    * The browser does not call `/login/student` directly: it posts to the same-origin proxy `POST /api/login/auth`, which forwards the request unchanged.
     * The frontend aborts any data request that takes more than **10 seconds** and shows an error state.
     * List endpoints return a plain JSON array. An empty array means "no data" (not 404).
 servers:
@@ -15,7 +16,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /login/auth:
+  /login/student:
     post:
       tags: [Auth]
       summary: Log in and get a JWT

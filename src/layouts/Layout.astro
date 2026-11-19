@@ -1,0 +1,147 @@
+---
+import CookieConsent from '../components/CookieConsent.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <CookieConsent />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --field: #f1f2f4;
+    --field-hover: #e9eaed;
+    --text: #191c1f;
+    --text-muted: #6b7079;
+    --border: #e6e7ea;
+    --accent: #0a5cff;
+    --accent-hover: #004ce0;
+    --focus: rgb(10 92 255 / 0.35);
+    --primary: #191c1f;
+    --primary-hover: #33373c;
+    --on-primary: #ffffff;
+    --secondary: #f1f2f4;
+    --secondary-hover: #e4e5e8;
+    --switch-off: #c9ccd1;
+    --danger: #d6293e;
+    --danger-bg: #fdecee;
+    --success: #0f9d58;
+    --success-bg: #e5f6ed;
+    --shadow-lg: 0 24px 48px -12px rgb(16 24 40 / 0.18), 0 4px 12px rgb(16 24 40 / 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      color-scheme: dark;
+      --bg: #0b0c0e;
+      --surface: #17191c;
+      --field: #1f2226;
+      --field-hover: #262a2f;
+      --text: #f4f5f6;
+      --text-muted: #9aa0a8;
+      --border: #2a2e33;
+      --accent: #4d8bff;
+      --accent-hover: #6b9fff;
+      --focus: rgb(77 139 255 / 0.4);
+      --primary: #ffffff;
+      --primary-hover: #e2e4e7;
+      --on-primary: #0b0c0e;
+      --secondary: #23272b;
+      --secondary-hover: #2d3237;
+      --switch-off: #3a3f45;
+      --danger: #ff6b7c;
+      --danger-bg: rgb(255 107 124 / 0.12);
+      --success: #3ddc84;
+      --success-bg: rgb(61 220 132 / 0.12);
+      --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.6);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body { margin: 0; }
+  body {
+    min-height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 28px;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn:active:not(:disabled) { transform: scale(0.98); }
+  .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .btn:disabled { cursor: progress; opacity: 0.8; }
+  .btn--sm { height: 44px; padding: 0 20px; font-size: 14px; }
+  .btn--block { width: 100%; }
+
+  .btn--primary { background: var(--primary); color: var(--on-primary); }
+  .btn--primary:hover:not(:disabled) { background: var(--primary-hover); }
+  .btn--secondary { background: var(--secondary); color: var(--text); }
+  .btn--secondary:hover:not(:disabled) { background: var(--secondary-hover); }
+  .btn--link {
+    height: auto;
+    padding: 8px 4px;
+    background: none;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .btn--link:hover { color: var(--accent-hover); }
+
+  .spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .btn.is-loading .spinner { display: block; }
+  .btn.is-loading .btn__label { opacity: 0; position: absolute; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>

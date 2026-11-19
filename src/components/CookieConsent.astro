@@ -1,0 +1,210 @@
+---
+---
+
+<div
+  id="cc"
+  class="cc"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="cc-title"
+  aria-describedby="cc-text"
+  hidden
+>
+  <h2 id="cc-title" class="cc__title">We use cookies</h2>
+  <p id="cc-text" class="cc__text">
+    Essential cookies keep the site working and let you sign in.
+    Analytics and marketing cookies are only used with your consent.
+  </p>
+
+  <div id="cc-prefs" class="cc__prefs" hidden>
+    <label class="cc__row">
+      <span class="cc__row-text">
+        <strong>Essential</strong>
+        <small>Sign-in, security and remembering your choice. Always on.</small>
+      </span>
+      <input type="checkbox" role="switch" class="switch" checked disabled />
+    </label>
+    <label class="cc__row">
+      <span class="cc__row-text">
+        <strong>Analytics</strong>
+        <small>Help us understand how the site is used so we can improve it.</small>
+      </span>
+      <input type="checkbox" role="switch" class="switch" name="analytics" />
+    </label>
+    <label class="cc__row">
+      <span class="cc__row-text">
+        <strong>Marketing</strong>
+        <small>Let us show you relevant ads on other websites.</small>
+      </span>
+      <input type="checkbox" role="switch" class="switch" name="marketing" />
+    </label>
+  </div>
+
+  <div class="cc__actions">
+    <button type="button" class="btn btn--link" data-cc="customize">Customize</button>
+    <span class="cc__spacer"></span>
+    <button type="button" class="btn btn--secondary btn--sm" data-cc="reject">Reject all</button>
+    <button type="button" class="btn btn--primary btn--sm" data-cc="accept">Accept all</button>
+    <button type="button" class="btn btn--primary btn--sm" data-cc="save" hidden>Save choices</button>
+  </div>
+</div>
+
+<script>
+  import { getConsent, saveConsent } from '../lib/consent';
+
+  const banner = document.getElementById('cc') as HTMLDivElement;
+  const prefs = document.getElementById('cc-prefs') as HTMLDivElement;
+  const analytics = banner.querySelector<HTMLInputElement>('input[name="analytics"]')!;
+  const marketing = banner.querySelector<HTMLInputElement>('input[name="marketing"]')!;
+  const btn = (name: string) => banner.querySelector<HTMLButtonElement>(`[data-cc="${name}"]`)!;
+
+  function setExpanded(expanded: boolean) {
+    prefs.hidden = !expanded;
+    btn('customize').hidden = expanded;
+    btn('accept').hidden = expanded;
+    btn('save').hidden = !expanded;
+  }
+
+  function open(expanded = false) {
+    const current = getConsent();
+    analytics.checked = current?.analytics ?? false;
+    marketing.checked = current?.marketing ?? false;
+    setExpanded(expanded);
+    banner.hidden = false;
+  }
+
+  function close() {
+    banner.hidden = true;
+  }
+
+  btn('accept').addEventListener('click', () => {
+    saveConsent({ analytics: true, marketing: true });
+    close();
+  });
+  btn('reject').addEventListener('click', () => {
+    saveConsent({ analytics: false, marketing: false });
+    close();
+  });
+  btn('save').addEventListener('click', () => {
+    saveConsent({ analytics: analytics.checked, marketing: marketing.checked });
+    close();
+  });
+  btn('customize').addEventListener('click', () => setExpanded(true));
+  // Any element with data-cookie-settings opens the preferences
+  document.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('[data-cookie-settings]')) open(true);
+  });
+
+  if (getConsent()) close();
+  else open();
+</script>
+
+<style>
+  .cc {
+    position: fixed;
+    z-index: 50;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: 440px;
+    margin-left: auto;
+    padding: 24px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    animation: cc-in 0.25s ease-out;
+  }
+  .cc[hidden] { display: none; }
+  @keyframes cc-in {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+
+  .cc__title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .cc__text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .cc__prefs {
+    display: grid;
+    gap: 4px;
+    margin-top: 16px;
+  }
+  .cc__prefs[hidden] { display: none; }
+  .cc__row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--field);
+    cursor: pointer;
+  }
+  .cc__row:has(input:disabled) { cursor: default; }
+  .cc__row-text {
+    display: grid;
+    gap: 2px;
+    flex: 1;
+    font-size: 14px;
+  }
+  .cc__row-text small {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .switch {
+    appearance: none;
+    flex: none;
+    position: relative;
+    width: 44px;
+    height: 26px;
+    margin: 0;
+    border-radius: 999px;
+    background: var(--switch-off);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+    transition: transform 0.2s;
+  }
+  .switch:checked { background: var(--accent); }
+  .switch:checked::after { transform: translateX(18px); }
+  .switch:disabled { opacity: 0.55; cursor: not-allowed; }
+  .switch:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .cc__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .cc__spacer { flex: 1; }
+  .cc__actions [hidden] { display: none; }
+
+  @media (max-width: 480px) {
+    .cc { padding: 20px; border-radius: 20px; }
+    .cc__actions .btn--sm { flex: 1; }
+    .cc__spacer { display: none; }
+    .cc__actions .btn--link { width: 100%; order: 3; }
+  }
+</style>

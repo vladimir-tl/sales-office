@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Sales Office API
+  version: 1.0.0
+  description: |
+    Backend contract used by the Sales Office frontend.
+
+    * All data endpoints require a JWT from `POST /login/auth`, sent as `Authorization: Bearer <token>`.
+    * The frontend aborts any data request that takes more than **10 seconds** and shows an error state.
+    * List endpoints return a plain JSON array. An empty array means "no data" (not 404).
+servers:
+  - url: https://backend.tallinn-learning.ee
+
+security:
+  - bearerAuth: []
+
+paths:
+  /login/auth:
+    post:
+      tags: [Auth]
+      summary: Log in and get a JWT
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: jane.doe
+              password: s3cret-pass
+      responses:
+        '200':
+          description: JWT as plain text. Payload contains `sub` (username) and `exp` (unix seconds).
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYW5lLmRvZSIsImV4cCI6MTc5OTk5OTk5OX0.signature
+        '401':
+          description: Wrong username or password
+        '403':
+          description: Account is not allowed to log in
+
+  /sales:
+    get:
+      tags: [Sales]
+      summary: List sales
+      operationId: listSales
+      responses:
+        '200':
+          description: All sales visible to the user, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sale'
+              examples:
+                some:
+                  summary: A few sales
+                  value:
+                    - id: S-1042
+                      date: '2026-11-18T10:24:00Z'
+                      customer: Northwind Ltd
+                      product: Annual licence
+                      quantity: 2
+                      amount: 4200.00
+                      currency: EUR
+                      status: paid
+                    - id: S-1043
+                      date: '2026-11-18T14:02:00Z'
+                      customer: Baltic Trade Co.
+                      product: Onboarding package
+                      quantity: 1
+                      amount: 12800.00
+                      currency: EUR
+                      status: pending
+                    - id: S-1044
+                      date: '2026-11-19T08:40:00Z'
+                      customer: Green Leaf Studio
+                      product: Monthly licence
+                      quantity: 4
+                      amount: 980.00
+                      currency: EUR
+                      status: cancelled
+                empty:
+                  summary: No sales
+                  value: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /products:
+    get:
+      tags: [Products]
+      summary: List products
+      operationId: listProducts
+      responses:
+        '200':
+          description: Product catalogue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                some:
+                  summary: A few products
+                  value:
+                    - id: P-001
+                      name: Annual licence
+                      sku: LIC-ANNUAL
+                      price: 2100.00
+                      currency: EUR
+                      stock: 120
+                      active: true
+                    - id: P-002
+                      name: Monthly licence
+                      sku: LIC-MONTH
+                      price: 245.00
+                      currency: EUR
+                      stock: 0
+                      active: false
+                empty:
+                  summary: No products
+                  value: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Token is missing, invalid or expired. The frontend clears the token and offers to log in again.
+    ServerError:
+      description: Unexpected server error. The frontend shows the status code and a "Try again" button.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    Sale:
+      type: object
+      required: [id, date, customer, product, quantity, amount, currency, status]
+      properties:
+        id:
+          type: string
+          example: S-1042
+        date:
+          type: string
+          format: date-time
+          description: ISO 8601, UTC
+        customer:
+          type: string
+          example: Northwind Ltd
+        product:
+          type: string
+          description: Product name
+          example: Annual licence
+        quantity:
+          type: integer
+          minimum: 1
+        amount:
+          type: number
+          format: double
+          description: Total for the sale, in `currency`
+          example: 4200.00
+        currency:
+          type: string
+          description: ISO 4217 code
+          example: EUR
+        status:
+          type: string
+          enum: [paid, pending, cancelled]
+
+    Product:
+      type: object
+      required: [id, name, sku, price, currency, stock, active]
+      properties:
+        id:
+          type: string
+          example: P-001
+        name:
+          type: string
+        sku:
+          type: string
+        price:
+          type: number
+          format: double
+          description: Unit price, in `currency`
+        currency:
+          type: string
+          description: ISO 4217 code
+          example: EUR
+        stock:
+          type: integer
+          minimum: 0
+        active:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string

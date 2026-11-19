@@ -1,0 +1,18 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ResourceView from '../../components/ResourceView.astro';
+import type { Column } from '../../lib/api';
+
+const columns: Column[] = [
+  { key: 'id', label: 'ID' },
+  { key: 'name', label: 'Name' },
+  { key: 'sku', label: 'SKU' },
+  { key: 'price', label: 'Price', format: 'money' },
+  { key: 'stock', label: 'In stock', format: 'number' },
+  { key: 'active', label: 'Active', format: 'boolean' },
+];
+---
+
+<DashboardLayout title="Products">
+  <ResourceView resource="products" title="Products" subtitle="Catalogue, prices and stock" columns={columns} />
+</DashboardLayout>

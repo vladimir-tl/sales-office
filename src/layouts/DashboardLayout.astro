@@ -1,0 +1,191 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '');
+
+const nav = [
+  {
+    href: '/dashboard/sales',
+    label: 'Sales',
+    testid: 'nav-sales',
+    icon: 'M3 3h2v16h16v2H3V3Zm4 12 4-5 3 3 5-7 1.6 1.2-6.4 9-3-3-2.6 3.2L7 15Z',
+  },
+  {
+    href: '/dashboard/products',
+    label: 'Products',
+    testid: 'nav-products',
+    icon: 'M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.2 6.3 3.1L12 10.5 5.7 7.3 12 4.2ZM5 9l6 3v7.7l-6-3V9Zm8 10.7V12l6-3v7.7l-6 3Z',
+  },
+];
+---
+
+<Layout title={`${title} — Sales Office`}>
+  <script is:inline>
+    // Auth guard: runs before the page renders, so a logged-out visitor never sees the dashboard
+    (function () {
+      try {
+        var t = localStorage.getItem('auth_token');
+        var exp = t ? JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp : 0;
+        if (!t || (exp && exp * 1000 <= Date.now())) {
+          localStorage.removeItem('auth_token');
+          location.replace('/');
+        }
+      } catch (e) {
+        location.replace('/');
+      }
+    })();
+  </script>
+
+  <div class="app" data-testid="dashboard">
+    <aside class="side" data-testid="sidebar">
+      <a class="brand" href="/dashboard" data-testid="dashboard-brand">
+        <span class="brand__mark" aria-hidden="true">S</span>
+        <span class="brand__name">Sales Office</span>
+      </a>
+
+      <nav class="nav" aria-label="Main" data-testid="sidebar-nav">
+        {nav.map((item) => (
+          <a
+            class="nav__item"
+            href={item.href}
+            data-testid={item.testid}
+            aria-current={path === item.href ? 'page' : undefined}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg>
+            <span>{item.label}</span>
+          </a>
+        ))}
+      </nav>
+
+      <div class="side__foot">
+        <div class="user" data-testid="sidebar-user">
+          <span class="user__avatar" id="user-avatar" aria-hidden="true"></span>
+          <span class="user__name" id="user-name" data-testid="sidebar-username"></span>
+        </div>
+        <button type="button" class="btn btn--secondary btn--sm btn--block" id="logout" data-testid="logout-button">
+          Log out
+        </button>
+      </div>
+    </aside>
+
+    <main class="content" data-testid="dashboard-content">
+      <slot />
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { decodeJwt, readToken, writeToken } from '../lib/auth';
+
+  const name = decodeJwt(readToken() ?? '')?.sub ?? '';
+  document.getElementById('user-name')!.textContent = name;
+  document.getElementById('user-avatar')!.textContent = name.slice(0, 1).toUpperCase() || '?';
+
+  document.getElementById('logout')!.addEventListener('click', () => {
+    writeToken(null);
+    location.replace('/');
+  });
+</script>
+
+<style>
+  .app {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    min-height: 100dvh;
+  }
+
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .brand__mark {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-size: 16px;
+  }
+
+  .nav { display: grid; gap: 4px; }
+  .nav__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav__item svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+  .nav__item:hover { background: var(--field); color: var(--text); }
+  .nav__item:focus-visible { outline: 3px solid var(--focus); }
+  .nav__item[aria-current='page'] { background: var(--field); color: var(--text); font-weight: 600; }
+
+  .side__foot { margin-top: auto; display: grid; gap: 12px; }
+  .user { display: flex; align-items: center; gap: 10px; padding: 0 8px; min-width: 0; }
+  .user__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .user__name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .content { padding: 32px clamp(16px, 4vw, 48px); min-width: 0; }
+
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; }
+    .side {
+      position: static;
+      height: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 16px;
+      padding: 12px 16px;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand__name { display: none; }
+    .nav { display: flex; flex: 1; }
+    .side__foot { margin: 0; display: flex; align-items: center; }
+    .user__name { display: none; }
+    .side__foot .btn { width: auto; }
+  }
+</style>

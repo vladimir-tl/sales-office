@@ -1,0 +1,292 @@
+---
+import type { Column } from '../lib/api';
+
+interface Props {
+  /** Resource path on the API, e.g. "sales" → GET {API}/sales; also the data-testid prefix */
+  resource: string;
+  title: string;
+  subtitle?: string;
+  columns: Column[];
+}
+
+const { resource, title, subtitle, columns } = Astro.props;
+// Data endpoints aren't on the backend yet, so by default they go to our own stub (/api/*),
+// which never answers in time. Set PUBLIC_DATA_API_URL to the backend once they exist.
+const dataApiUrl = (import.meta.env.PUBLIC_DATA_API_URL || '/api').replace(/\/$/, '');
+const endpoint = `${dataApiUrl}/${resource}`;
+const id = (part: string) => `${resource}-${part}`;
+---
+
+<section
+  class="resource"
+  data-resource-view
+  data-endpoint={endpoint}
+  data-resource={resource}
+  data-columns={JSON.stringify(columns)}
+  data-state="loading"
+  data-testid={id('view')}
+>
+  <header class="resource__head">
+    <div>
+      <h1 data-testid={id('title')}>{title}</h1>
+      {subtitle && <p>{subtitle}</p>}
+    </div>
+    <button type="button" class="btn btn--secondary btn--sm" data-action="reload" data-testid={id('reload')}>
+      Refresh
+    </button>
+  </header>
+
+  <div class="panel">
+    <div class="state state--loading" data-state-pane="loading" role="status" aria-live="polite" data-testid={id('loading')}>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <span class="spinner spinner--lg" aria-hidden="true"></span>
+      <p>Loading {title.toLowerCase()}…</p>
+    </div>
+
+    <div class="state state--error" data-state-pane="error" role="alert" hidden data-testid={id('error')}>
+      <div class="state__icon" aria-hidden="true">!</div>
+      <p class="state__title">Couldn't load {title.toLowerCase()}</p>
+      <p class="state__text" data-slot="error-message" data-testid={id('error-message')}></p>
+      <div class="state__actions">
+        <button type="button" class="btn btn--primary btn--sm" data-action="reload" data-testid={id('retry')}>Try again</button>
+        <a class="btn btn--secondary btn--sm" href="/" data-slot="relogin" hidden data-testid={id('relogin')}>Log in again</a>
+      </div>
+    </div>
+
+    <div class="state state--empty" data-state-pane="empty" hidden data-testid={id('empty')}>
+      <p class="state__title">No {title.toLowerCase()} yet</p>
+      <p class="state__text">When there is something to show, it will appear here.</p>
+    </div>
+
+    <div class="table-wrap" data-state-pane="ready" hidden>
+      <table class="table" data-testid={id('table')}>
+        <thead>
+          <tr>
+            {columns.map((c) => (
+              <th class={`col--${c.format ?? 'text'}`} data-testid={id(`col-${c.key}`)}>{c.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody data-slot="rows"></tbody>
+      </table>
+      <p class="table-foot" data-slot="count" data-testid={id('count')}></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { ApiError, apiGet, type Column } from '../lib/api';
+  import { validToken, writeToken } from '../lib/auth';
+
+  type Row = Record<string, unknown>;
+  type State = 'loading' | 'error' | 'empty' | 'ready';
+
+  const money = (value: number, currency: string) => {
+    try {
+      return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(value);
+    } catch {
+      return `${value.toFixed(2)} ${currency}`;
+    }
+  };
+
+  function formatCell(value: unknown, column: Column, row: Row): string {
+    if (value === null || value === undefined) return '—';
+    switch (column.format) {
+      case 'number':
+        return typeof value === 'number' ? value.toLocaleString('en-GB') : String(value);
+      case 'money':
+        return typeof value === 'number' ? money(value, String(row.currency ?? 'EUR')) : String(value);
+      case 'date': {
+        const d = new Date(String(value));
+        return isNaN(d.getTime()) ? String(value) : d.toLocaleDateString('en-GB', { dateStyle: 'medium' });
+      }
+      case 'boolean':
+        return value ? 'Yes' : 'No';
+      default:
+        return String(value);
+    }
+  }
+
+  function init(root: HTMLElement) {
+    const endpoint = root.dataset.endpoint!;
+    const resource = root.dataset.resource!;
+    const columns = JSON.parse(root.dataset.columns!) as Column[];
+    const panes = root.querySelectorAll<HTMLElement>('[data-state-pane]');
+    const rowsEl = root.querySelector<HTMLElement>('[data-slot="rows"]')!;
+    const countEl = root.querySelector<HTMLElement>('[data-slot="count"]')!;
+    const errorEl = root.querySelector<HTMLElement>('[data-slot="error-message"]')!;
+    const reloginEl = root.querySelector<HTMLElement>('[data-slot="relogin"]')!;
+    const reloadButtons = root.querySelectorAll<HTMLButtonElement>('[data-action="reload"]');
+    let requestId = 0;
+
+    function setState(state: State) {
+      root.dataset.state = state;
+      root.setAttribute('aria-busy', String(state === 'loading'));
+      panes.forEach((p) => (p.hidden = p.dataset.statePane !== state));
+      reloadButtons.forEach((b) => (b.disabled = state === 'loading'));
+    }
+
+    function render(rows: Row[]) {
+      rowsEl.replaceChildren(
+        ...rows.map((row, i) => {
+          const tr = document.createElement('tr');
+          tr.dataset.testid = `${resource}-row`;
+          tr.dataset.rowIndex = String(i);
+          if (row.id !== undefined) tr.dataset.rowId = String(row.id);
+          for (const column of columns) {
+            const td = document.createElement('td');
+            td.className = `col--${column.format ?? 'text'}`;
+            td.dataset.testid = `${resource}-cell-${column.key}`;
+            const text = formatCell(row[column.key], column, row);
+            if (column.format === 'status') {
+              const badge = document.createElement('span');
+              badge.className = `badge badge--${String(row[column.key] ?? '').toLowerCase()}`;
+              badge.textContent = text;
+              td.append(badge);
+            } else {
+              td.textContent = text;
+            }
+            tr.append(td);
+          }
+          return tr;
+        }),
+      );
+      countEl.textContent = `${rows.length} ${rows.length === 1 ? 'record' : 'records'}`;
+    }
+
+    async function load() {
+      const token = validToken();
+      if (!token) {
+        location.replace('/');
+        return;
+      }
+
+      const current = ++requestId;
+      setState('loading');
+      reloginEl.hidden = true;
+
+      try {
+        const data = await apiGet<unknown>(endpoint, token);
+        if (current !== requestId) return;
+        if (!Array.isArray(data)) throw new ApiError('invalid', 'The server sent an unexpected response.');
+        if (data.length === 0) {
+          setState('empty');
+          return;
+        }
+        render(data as Row[]);
+        setState('ready');
+      } catch (err) {
+        if (current !== requestId) return;
+        const apiErr = err instanceof ApiError ? err : new ApiError('network', 'Something went wrong.');
+        root.dataset.errorKind = apiErr.kind;
+        errorEl.textContent = apiErr.message;
+        if (apiErr.kind === 'unauthorized') {
+          writeToken(null);
+          reloginEl.hidden = false;
+        }
+        setState('error');
+      }
+    }
+
+    reloadButtons.forEach((b) => b.addEventListener('click', load));
+    load();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-resource-view]').forEach(init);
+</script>
+
+<style>
+  .resource { display: grid; gap: 24px; max-width: 1200px; }
+
+  .resource__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .resource__head h1 { margin: 0; font-size: clamp(28px, 4vw, 36px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+  .resource__head p { margin: 6px 0 0; color: var(--text-muted); }
+
+  .panel {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  [data-state-pane][hidden] { display: none !important; }
+
+  .state {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 72px 24px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .state p { margin: 0; }
+  .state__title { color: var(--text); font-weight: 600; font-size: 17px; }
+  .state__text { max-width: 420px; font-size: 14px; }
+  .state__actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+  .state__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 22px;
+  }
+
+  .state--loading .spinner--lg {
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    color: var(--accent);
+    border-width: 3px;
+  }
+
+  .progress { position: absolute; inset: 0 0 auto; height: 3px; overflow: hidden; background: var(--field); }
+  .progress span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    background: var(--accent);
+    animation: indeterminate 1.4s ease-in-out infinite;
+  }
+  @keyframes indeterminate {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(250%); }
+  }
+
+  .table-wrap { overflow-x: auto; }
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table th,
+  .table td { padding: 14px 20px; text-align: left; white-space: nowrap; }
+  .table th {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .table tbody tr + tr td { border-top: 1px solid var(--border); }
+  .table tbody tr:hover td { background: var(--field); }
+  .table .col--number,
+  .table .col--money { text-align: right; font-variant-numeric: tabular-nums; }
+  .table-foot { margin: 0; padding: 12px 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: var(--field);
+    color: var(--text-muted);
+  }
+  .badge--paid { background: var(--success-bg); color: var(--success); }
+  .badge--pending { background: rgb(255 176 32 / 0.16); color: #b36b00; }
+  .badge--cancelled { background: var(--danger-bg); color: var(--danger); }
+</style>

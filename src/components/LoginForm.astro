@@ -1,6 +1,6 @@
 ---
 const apiUrl = (import.meta.env.PUBLIC_API_URL ?? 'https://backend.tallinn-learning.ee').replace(/\/$/, '');
-const endpoint = `${apiUrl}/login/student`;
+const endpoint = `${apiUrl}/login/auth`;
 ---
 
 <div class="login">
@@ -57,22 +57,17 @@ const endpoint = `${apiUrl}/login/student`;
     </button>
   </form>
 
-  <section id="login-success" class="login__success" hidden aria-live="polite" data-testid="login-success">
-    <div class="login__check" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="m9.5 16.2-4.2-4.2-1.4 1.4 5.6 5.6 12-12-1.4-1.4z"/></svg>
-    </div>
-    <h1 data-testid="login-success-title">You're logged in</h1>
-    <p>Welcome, <strong id="login-user" data-testid="login-success-user"></strong></p>
-    <p class="login__meta" id="login-exp" data-testid="login-session-expiry"></p>
-    <button type="button" class="btn btn--secondary btn--block" id="logout" data-testid="logout-button">Log out</button>
-  </section>
 </div>
 
 <script>
-  const TOKEN_KEY = 'auth_token';
+  import { decodeJwt, validToken, writeToken } from '../lib/auth';
+
+  const DASHBOARD_URL = '/dashboard';
+
+  // Already logged in with a valid token — go straight to the dashboard
+  if (validToken()) location.replace(DASHBOARD_URL);
 
   const form = document.getElementById('login-form') as HTMLFormElement;
-  const success = document.getElementById('login-success') as HTMLElement;
   const errorBox = document.getElementById('login-error') as HTMLParagraphElement;
   const submit = document.getElementById('login-submit') as HTMLButtonElement;
   const username = form.elements.namedItem('username') as HTMLInputElement;
@@ -81,38 +76,6 @@ const endpoint = `${apiUrl}/login/student`;
   const endpoint = form.dataset.endpoint!;
 
   class LoginError extends Error {}
-
-  interface JwtPayload {
-    sub?: string;
-    exp?: number;
-  }
-
-  function decodeJwt(token: string): JwtPayload | null {
-    try {
-      const part = token.split('.')[1];
-      const json = atob(part.replace(/-/g, '+').replace(/_/g, '/'));
-      return JSON.parse(json) as JwtPayload;
-    } catch {
-      return null;
-    }
-  }
-
-  function readToken(): string | null {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch {
-      return null;
-    }
-  }
-
-  function writeToken(token: string | null) {
-    try {
-      if (token) localStorage.setItem(TOKEN_KEY, token);
-      else localStorage.removeItem(TOKEN_KEY);
-    } catch {
-      // storage unavailable — the session lasts until reload
-    }
-  }
 
   function showError(message: string) {
     errorBox.textContent = message;
@@ -129,23 +92,6 @@ const endpoint = `${apiUrl}/login/student`;
     submit.disabled = loading;
     submit.classList.toggle('is-loading', loading);
     submit.setAttribute('aria-busy', String(loading));
-  }
-
-  function showSuccess(token: string, fallbackName: string) {
-    const payload = decodeJwt(token);
-    document.getElementById('login-user')!.textContent = payload?.sub ?? fallbackName;
-    document.getElementById('login-exp')!.textContent = payload?.exp
-      ? `Session active until ${new Date(payload.exp * 1000).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}`
-      : '';
-    form.hidden = true;
-    success.hidden = false;
-  }
-
-  function showForm() {
-    success.hidden = true;
-    form.hidden = false;
-    password.value = '';
-    username.focus();
   }
 
   toggle.addEventListener('click', () => {
@@ -185,55 +131,40 @@ const endpoint = `${apiUrl}/login/student`;
       }
 
       const token = (await res.text()).trim();
-      if (!token) throw new LoginError('No token received. Please try again.');
+      if (!token || !decodeJwt(token)) throw new LoginError('No token received. Please try again.');
 
       writeToken(token);
-      showSuccess(token, user);
+      location.assign(DASHBOARD_URL);
     } catch (err) {
       showError(
         err instanceof LoginError
           ? err.message
           : "Couldn't reach the server. Check your internet connection.",
       );
-    } finally {
       setLoading(false);
     }
   });
-
-  document.getElementById('logout')!.addEventListener('click', () => {
-    writeToken(null);
-    showForm();
-  });
-
-  // Already logged in with a valid token — show the logged-in state
-  const saved = readToken();
-  const exp = saved ? decodeJwt(saved)?.exp : undefined;
-  if (saved && (!exp || exp * 1000 > Date.now())) showSuccess(saved, '');
-  else if (saved) writeToken(null);
 </script>
 
 <style>
   .login { width: 100%; max-width: 400px; }
 
   .login__head { margin-bottom: 32px; }
-  .login__head h1,
-  .login__success h1 {
+  .login__head h1 {
     margin: 0 0 8px;
     font-size: clamp(32px, 5vw, 40px);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.1;
   }
-  .login__head p,
-  .login__success p {
+  .login__head p {
     margin: 0;
     color: var(--text-muted);
     font-size: 16px;
   }
 
   .login__form { display: grid; gap: 12px; }
-  .login__form[hidden],
-  .login__success[hidden] { display: none; }
+  .login__form[hidden] { display: none; }
 
   .field { position: relative; }
   .field input {
@@ -306,17 +237,4 @@ const endpoint = `${apiUrl}/login/student`;
 
   .login__form .btn--block { margin-top: 12px; }
 
-  .login__success { display: grid; gap: 8px; }
-  .login__success .btn { margin-top: 24px; }
-  .login__meta { font-size: 14px !important; }
-  .login__check {
-    display: grid;
-    place-items: center;
-    width: 56px;
-    height: 56px;
-    margin-bottom: 16px;
-    border-radius: 50%;
-    background: var(--success-bg);
-  }
-  .login__check svg { width: 28px; height: 28px; fill: var(--success); }
 </style>

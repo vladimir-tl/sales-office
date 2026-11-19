@@ -1,0 +1,19 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ResourceView from '../../components/ResourceView.astro';
+import type { Column } from '../../lib/api';
+
+const columns: Column[] = [
+  { key: 'id', label: 'ID' },
+  { key: 'date', label: 'Date', format: 'date' },
+  { key: 'customer', label: 'Customer' },
+  { key: 'product', label: 'Product' },
+  { key: 'quantity', label: 'Qty', format: 'number' },
+  { key: 'amount', label: 'Amount', format: 'money' },
+  { key: 'status', label: 'Status', format: 'status' },
+];
+---
+
+<DashboardLayout title="Sales">
+  <ResourceView resource="sales" title="Sales" subtitle="All deals and their payment status" columns={columns} />
+</DashboardLayout>

@@ -47,14 +47,20 @@ function readCookie(name: string): string | null {
   return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
 }
 
+/**
+ * Согласие считается данным, только если оно есть и в localStorage, и в cookie.
+ * Удалили любое из двух — баннер покажется снова.
+ * Если localStorage недоступен совсем (запрет сайта), смотрим только cookie.
+ */
 export function getConsent(): Consent | null {
-  let fromStorage: string | null = null;
+  const fromCookie = parse(readCookie(CONSENT_KEY));
+  let fromStorage: Consent | null;
   try {
-    fromStorage = localStorage.getItem(CONSENT_KEY);
+    fromStorage = parse(localStorage.getItem(CONSENT_KEY));
   } catch {
-    // localStorage недоступен (приватный режим, запрет сайта) — берём cookie
+    return fromCookie;
   }
-  return parse(fromStorage) ?? parse(readCookie(CONSENT_KEY));
+  return fromStorage && fromCookie ? fromStorage : null;
 }
 
 export function hasConsent(category: ConsentCategory): boolean {

@@ -1,7 +1,7 @@
 /**
  * Хранение согласия на cookie.
- * Значение пишется и в localStorage, и в cookie `cookie_consent`
- * (cookie нужна, чтобы выбор был виден и серверу).
+ * Единственное место хранения — cookie `cookie_consent` (JSON).
+ * Cookie видна и серверу (Astro.cookies), и истекает сама через год.
  */
 
 export const CONSENT_KEY = 'cookie_consent';
@@ -47,20 +47,8 @@ function readCookie(name: string): string | null {
   return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
 }
 
-/**
- * Согласие считается данным, только если оно есть и в localStorage, и в cookie.
- * Удалили любое из двух — баннер покажется снова.
- * Если localStorage недоступен совсем (запрет сайта), смотрим только cookie.
- */
 export function getConsent(): Consent | null {
-  const fromCookie = parse(readCookie(CONSENT_KEY));
-  let fromStorage: Consent | null;
-  try {
-    fromStorage = parse(localStorage.getItem(CONSENT_KEY));
-  } catch {
-    return fromCookie;
-  }
-  return fromStorage && fromCookie ? fromStorage : null;
+  return parse(readCookie(CONSENT_KEY));
 }
 
 export function hasConsent(category: ConsentCategory): boolean {
@@ -75,16 +63,9 @@ export function saveConsent(choice: Pick<Consent, ConsentCategory>): Consent {
     marketing: choice.marketing,
     updatedAt: new Date().toISOString(),
   };
-  const raw = JSON.stringify(consent);
-
-  try {
-    localStorage.setItem(CONSENT_KEY, raw);
-  } catch {
-    // игнорируем — cookie ниже всё равно сохранит выбор
-  }
 
   const secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${CONSENT_KEY}=${encodeURIComponent(raw)}; Max-Age=${MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+  document.cookie = `${CONSENT_KEY}=${encodeURIComponent(JSON.stringify(consent))}; Max-Age=${MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
 
   window.dispatchEvent(new CustomEvent<Consent>('cookie-consent', { detail: consent }));
   return consent;

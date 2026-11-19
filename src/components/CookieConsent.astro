@@ -1,15 +1,7 @@
 ---
 ---
 
-<div
-  id="cc"
-  class="cc"
-  role="dialog"
-  aria-modal="false"
-  aria-labelledby="cc-title"
-  aria-describedby="cc-text"
-  hidden
->
+<dialog id="cc" class="cc" aria-labelledby="cc-title" aria-describedby="cc-text">
   <h2 id="cc-title" class="cc__title">We use cookies</h2>
   <p id="cc-text" class="cc__text">
     Essential cookies keep the site working and let you sign in.
@@ -47,12 +39,12 @@
     <button type="button" class="btn btn--primary btn--sm" data-cc="accept">Accept all</button>
     <button type="button" class="btn btn--primary btn--sm" data-cc="save" hidden>Save choices</button>
   </div>
-</div>
+</dialog>
 
 <script>
   import { getConsent, saveConsent } from '../lib/consent';
 
-  const banner = document.getElementById('cc') as HTMLDivElement;
+  const banner = document.getElementById('cc') as HTMLDialogElement;
   const prefs = document.getElementById('cc-prefs') as HTMLDivElement;
   const analytics = banner.querySelector<HTMLInputElement>('input[name="analytics"]')!;
   const marketing = banner.querySelector<HTMLInputElement>('input[name="marketing"]')!;
@@ -70,12 +62,19 @@
     analytics.checked = current?.analytics ?? false;
     marketing.checked = current?.marketing ?? false;
     setExpanded(expanded);
-    banner.hidden = false;
+    // showModal(): фон становится inert, фокус заперт внутри окна —
+    // пока не сделан выбор, форму входа нажать нельзя
+    if (!banner.open) banner.showModal();
   }
 
   function close() {
-    banner.hidden = true;
+    banner.close();
   }
+
+  // Esc закрывает окно, только если выбор уже был сделан раньше
+  banner.addEventListener('cancel', (event) => {
+    if (!getConsent()) event.preventDefault();
+  });
 
   btn('accept').addEventListener('click', () => {
     saveConsent({ analytics: true, marketing: true });
@@ -95,19 +94,15 @@
     if ((event.target as Element).closest('[data-cookie-settings]')) open(true);
   });
 
-  if (getConsent()) close();
-  else open();
+  if (!getConsent()) open();
 </script>
 
 <style>
   .cc {
-    position: fixed;
-    z-index: 50;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    max-width: 440px;
-    margin-left: auto;
+    width: min(440px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow: auto;
+    margin: auto;
     padding: 24px;
     background: var(--surface);
     color: var(--text);
@@ -116,7 +111,12 @@
     box-shadow: var(--shadow-lg);
     animation: cc-in 0.25s ease-out;
   }
-  .cc[hidden] { display: none; }
+  .cc:focus { outline: none; }
+  .cc::backdrop {
+    background: rgb(10 12 16 / 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
   @keyframes cc-in {
     from { opacity: 0; transform: translateY(12px); }
   }

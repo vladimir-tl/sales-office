@@ -9,7 +9,7 @@ test.describe('Login', () => {
     login = new LoginPage(page);
     await acceptCookies(page);
     await login.goto();
-    await expect(login.cookieDialog.root).toBeHidden();
+    await expect(login.cookieDialog.dialog).toBeHidden();
   });
 
   test('submitting username and password sends the login request', async ({ page }) => {

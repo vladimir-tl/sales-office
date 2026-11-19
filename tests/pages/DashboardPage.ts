@@ -1,18 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-
-export class SessionDialog {
-  readonly root: Locator;
-  readonly title: Locator;
-  readonly yes: Locator;
-  readonly no: Locator;
-
-  constructor(page: Page) {
-    this.root = page.getByTestId('session-dialog');
-    this.title = page.getByTestId('session-title');
-    this.yes = page.getByTestId('session-yes');
-    this.no = page.getByTestId('session-no');
-  }
-}
+import { SessionDialog } from './SessionDialog';
 
 export class DashboardPage {
   readonly sessionDialog: SessionDialog;

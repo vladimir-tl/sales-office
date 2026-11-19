@@ -21,9 +21,10 @@
 <script>
   import { writeToken } from '../lib/auth';
 
-  // Через минуту после открытия страницы (или после «Yes») спрашиваем,
-  // продолжать ли сессию. Таймер обычный setTimeout, поэтому в тестах
-  // его можно промотать через Playwright page.clock.
+  // После минуты бездействия спрашиваем, продолжать ли сессию.
+  // Любое действие пользователя (мышь, клавиатура, скролл, тач) перезапускает
+  // отсчёт. Таймер обычный setTimeout, поэтому в тестах его можно
+  // промотать через Playwright page.clock.
   const SESSION_WARNING_MS = 60_000;
 
   const dialog = document.getElementById('session-dialog') as HTMLDialogElement;
@@ -62,6 +63,14 @@
     writeToken(null);
     location.replace('/');
   });
+
+  // Пока диалог открыт, активность таймер не сбрасывает — ответить надо кнопкой
+  const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll', 'touchstart'];
+  for (const type of ACTIVITY_EVENTS) {
+    document.addEventListener(type, () => {
+      if (!dialog.open) schedule();
+    }, { capture: true, passive: true });
+  }
 
   schedule();
 </script>

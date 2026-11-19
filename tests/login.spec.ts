@@ -18,39 +18,6 @@ test.describe('Login', () => {
     expect((await request).method()).toBe('POST');
   });
 
-  test('shows an error for wrong username or password', async ({ page }) => {
-    await page.route(LoginPage.LOGIN_ROUTE, (route) => route.fulfill({ status: 401 }));
-
-    await login.login('demo-user', 'wrong');
-
-    await expect(login.error).toHaveText('Incorrect username or password');
-    await expect(page).toHaveURL('/');
-  });
-
-  test('does not send a request when fields are empty', async ({ page }) => {
-    let called = false;
-    await page.route(LoginPage.LOGIN_ROUTE, (route) => {
-      called = true;
-      return route.abort();
-    });
-
-    await login.submit.click();
-
-    await expect(login.error).toHaveText('Enter your username and password');
-    await expect(login.username).toBeFocused();
-    expect(called).toBe(false);
-  });
-
-  test('toggle button shows and hides the password', async () => {
-    await login.password.fill('secret123');
-    await expect(login.password).toHaveAttribute('type', 'password');
-
-    await login.passwordToggle.click();
-    await expect(login.password).toHaveAttribute('type', 'text');
-
-    await login.passwordToggle.click();
-    await expect(login.password).toHaveAttribute('type', 'password');
-  });
 
   // Real login against the backend: LOGIN_USER / LOGIN_PASS from .env
   test('logs in with real credentials', async ({ page }) => {

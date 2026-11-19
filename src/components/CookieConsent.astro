@@ -1,43 +1,50 @@
 ---
 ---
 
-<dialog id="cc" class="cc" aria-labelledby="cc-title" aria-describedby="cc-text">
-  <h2 id="cc-title" class="cc__title">We use cookies</h2>
-  <p id="cc-text" class="cc__text">
+<dialog
+  id="cc"
+  class="cc"
+  closedby="none"
+  aria-labelledby="cc-title"
+  aria-describedby="cc-text"
+  data-testid="cookie-dialog"
+>
+  <h2 id="cc-title" class="cc__title" data-testid="cookie-title">We use cookies</h2>
+  <p id="cc-text" class="cc__text" data-testid="cookie-text">
     Essential cookies keep the site working and let you sign in.
     Analytics and marketing cookies are only used with your consent.
   </p>
 
-  <div id="cc-prefs" class="cc__prefs" hidden>
+  <div id="cc-prefs" class="cc__prefs" data-testid="cookie-preferences" hidden>
     <label class="cc__row">
       <span class="cc__row-text">
         <strong>Essential</strong>
         <small>Sign-in, security and remembering your choice. Always on.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" checked disabled />
+      <input type="checkbox" role="switch" class="switch" checked disabled data-testid="cookie-essential-toggle" />
     </label>
     <label class="cc__row">
       <span class="cc__row-text">
         <strong>Analytics</strong>
         <small>Help us understand how the site is used so we can improve it.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" name="analytics" />
+      <input type="checkbox" role="switch" class="switch" name="analytics" data-testid="cookie-analytics-toggle" />
     </label>
     <label class="cc__row">
       <span class="cc__row-text">
         <strong>Marketing</strong>
         <small>Let us show you relevant ads on other websites.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" name="marketing" />
+      <input type="checkbox" role="switch" class="switch" name="marketing" data-testid="cookie-marketing-toggle" />
     </label>
   </div>
 
   <div class="cc__actions">
-    <button type="button" class="btn btn--link" data-cc="customize">Customize</button>
+    <button type="button" class="btn btn--link" data-cc="customize" data-testid="cookie-customize">Customize</button>
     <span class="cc__spacer"></span>
-    <button type="button" class="btn btn--secondary btn--sm" data-cc="reject">Reject all</button>
-    <button type="button" class="btn btn--primary btn--sm" data-cc="accept">Accept all</button>
-    <button type="button" class="btn btn--primary btn--sm" data-cc="save" hidden>Save choices</button>
+    <button type="button" class="btn btn--secondary btn--sm" data-cc="reject" data-testid="cookie-reject-all">Reject all</button>
+    <button type="button" class="btn btn--primary btn--sm" data-cc="accept" data-testid="cookie-accept-all">Accept all</button>
+    <button type="button" class="btn btn--primary btn--sm" data-cc="save" data-testid="cookie-save" hidden>Save choices</button>
   </div>
 </dialog>
 
@@ -67,13 +74,27 @@
     if (!banner.open) banner.showModal();
   }
 
+  // Закрыть окно можно только кнопками выбора — флаг ставит close()
+  let closingByChoice = false;
+
   function close() {
+    closingByChoice = true;
     banner.close();
   }
 
-  // Esc закрывает окно, только если выбор уже был сделан раньше
-  banner.addEventListener('cancel', (event) => {
-    if (!getConsent()) event.preventDefault();
+  // Esc не закрывает окно никогда (плюс closedby="none" в разметке)
+  banner.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') event.preventDefault();
+  });
+  banner.addEventListener('cancel', (event) => event.preventDefault());
+  // Страховка: Chrome при повторном Esc может закрыть <dialog>, игнорируя
+  // preventDefault. Если окно закрылось не через кнопку — открываем снова.
+  banner.addEventListener('close', () => {
+    if (closingByChoice) {
+      closingByChoice = false;
+      return;
+    }
+    banner.showModal();
   });
 
   btn('accept').addEventListener('click', () => {

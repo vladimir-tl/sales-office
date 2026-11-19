@@ -4,9 +4,9 @@ const endpoint = `${apiUrl}/login/student`;
 ---
 
 <div class="login">
-  <form id="login-form" class="login__form" novalidate data-endpoint={endpoint}>
+  <form id="login-form" class="login__form" novalidate data-endpoint={endpoint} data-testid="login-form">
     <header class="login__head">
-      <h1>Welcome back</h1>
+      <h1 data-testid="login-title">Welcome back</h1>
       <p>Log in to your Sales Office account</p>
     </header>
 
@@ -14,6 +14,7 @@ const endpoint = `${apiUrl}/login/student`;
       <input
         id="username"
         name="username"
+        data-testid="login-username"
         type="text"
         placeholder=" "
         autocomplete="username"
@@ -28,6 +29,7 @@ const endpoint = `${apiUrl}/login/student`;
       <input
         id="password"
         name="password"
+        data-testid="login-password"
         type="password"
         placeholder=" "
         autocomplete="current-password"
@@ -38,6 +40,7 @@ const endpoint = `${apiUrl}/login/student`;
         type="button"
         class="field__toggle"
         id="toggle-password"
+        data-testid="login-password-toggle"
         aria-label="Show password"
         aria-pressed="false"
       >
@@ -46,22 +49,22 @@ const endpoint = `${apiUrl}/login/student`;
       </button>
     </div>
 
-    <p id="login-error" class="login__error" role="alert" hidden></p>
+    <p id="login-error" class="login__error" role="alert" data-testid="login-error" hidden></p>
 
-    <button type="submit" class="btn btn--primary btn--block" id="login-submit">
+    <button type="submit" class="btn btn--primary btn--block" id="login-submit" data-testid="login-submit">
       <span class="btn__label">Log in</span>
       <span class="spinner" aria-hidden="true"></span>
     </button>
   </form>
 
-  <section id="login-success" class="login__success" hidden aria-live="polite">
+  <section id="login-success" class="login__success" hidden aria-live="polite" data-testid="login-success">
     <div class="login__check" aria-hidden="true">
       <svg viewBox="0 0 24 24"><path d="m9.5 16.2-4.2-4.2-1.4 1.4 5.6 5.6 12-12-1.4-1.4z"/></svg>
     </div>
-    <h1>You're logged in</h1>
-    <p>Welcome, <strong id="login-user"></strong></p>
-    <p class="login__meta" id="login-exp"></p>
-    <button type="button" class="btn btn--secondary btn--block" id="logout">Log out</button>
+    <h1 data-testid="login-success-title">You're logged in</h1>
+    <p>Welcome, <strong id="login-user" data-testid="login-success-user"></strong></p>
+    <p class="login__meta" id="login-exp" data-testid="login-session-expiry"></p>
+    <button type="button" class="btn btn--secondary btn--block" id="logout" data-testid="logout-button">Log out</button>
   </section>
 </div>
 

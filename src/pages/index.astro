@@ -6,7 +6,7 @@ import LoginForm from '../components/LoginForm.astro';
 <Layout title="Log in — Sales Office">
   <div class="page">
     <main class="page__main">
-      <a class="brand" href="/" aria-label="Sales Office home">
+      <a class="brand" href="/" aria-label="Sales Office home" data-testid="brand-link">
         <span class="brand__mark" aria-hidden="true">S</span>
         <span class="brand__name">Sales Office</span>
       </a>
@@ -15,9 +15,9 @@ import LoginForm from '../components/LoginForm.astro';
         <LoginForm />
       </div>
 
-      <footer class="page__foot">
+      <footer class="page__foot" data-testid="footer">
         <span>© {new Date().getFullYear()} Sales Office</span>
-        <button type="button" class="page__foot-link" data-cookie-settings>Cookie settings</button>
+        <button type="button" class="page__foot-link" data-cookie-settings data-testid="footer-cookie-settings">Cookie settings</button>
       </footer>
     </main>
 

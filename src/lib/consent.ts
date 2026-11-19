@@ -1,13 +1,13 @@
 /**
- * Хранение согласия на cookie.
- * Единственное место хранения — cookie `cookie_consent` (JSON).
- * Cookie видна и серверу (Astro.cookies), и истекает сама через год.
+ * Cookie consent storage.
+ * The only storage location is the `cookie_consent` cookie (JSON).
+ * The cookie is visible to the server (Astro.cookies) and expires on its own after one year.
  */
 
 export const CONSENT_KEY = 'cookie_consent';
-/** Увеличьте, если поменялся состав категорий — баннер покажется снова. */
+/** Bump this when the set of categories changes — the banner will be shown again. */
 export const CONSENT_VERSION = 1;
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 год
+const MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 year
 
 export type ConsentCategory = 'analytics' | 'marketing';
 

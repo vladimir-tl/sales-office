@@ -69,12 +69,12 @@
     analytics.checked = current?.analytics ?? false;
     marketing.checked = current?.marketing ?? false;
     setExpanded(expanded);
-    // showModal(): фон становится inert, фокус заперт внутри окна —
-    // пока не сделан выбор, форму входа нажать нельзя
+    // showModal(): the background becomes inert and focus is trapped in the dialog —
+    // the login form can't be used until a choice is made
     if (!banner.open) banner.showModal();
   }
 
-  // Закрыть окно можно только кнопками выбора — флаг ставит close()
+  // The dialog can only be closed via the choice buttons — close() sets the flag
   let closingByChoice = false;
 
   function close() {
@@ -82,13 +82,13 @@
     banner.close();
   }
 
-  // Esc не закрывает окно никогда (плюс closedby="none" в разметке)
+  // Esc never closes the dialog (plus closedby="none" in the markup)
   banner.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') event.preventDefault();
   });
   banner.addEventListener('cancel', (event) => event.preventDefault());
-  // Страховка: Chrome при повторном Esc может закрыть <dialog>, игнорируя
-  // preventDefault. Если окно закрылось не через кнопку — открываем снова.
+  // Safety net: on a repeated Esc, Chrome may close the <dialog> despite
+  // preventDefault. If it was closed other than via a button, reopen it.
   banner.addEventListener('close', () => {
     if (closingByChoice) {
       closingByChoice = false;

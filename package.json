@@ -8,7 +8,9 @@
     "preview": "astro build && wrangler dev",
     "deploy": "astro build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
   },
   "private": true,
   "dependencies": {
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@playwright/test": "^1.65.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.165.0"
   },

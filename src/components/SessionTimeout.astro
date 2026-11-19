@@ -21,10 +21,10 @@
 <script>
   import { writeToken } from '../lib/auth';
 
-  // После 30 секунд бездействия спрашиваем, продолжать ли сессию.
-  // Любое действие пользователя (мышь, клавиатура, скролл, тач) перезапускает
-  // отсчёт. Таймер обычный setTimeout, поэтому в тестах его можно
-  // промотать через Playwright page.clock.
+  // After 30 seconds of inactivity, ask whether to continue the session.
+  // Any user activity (mouse, keyboard, scroll, touch) restarts the
+  // countdown. The timer is a plain setTimeout, so tests can fast-forward
+  // it with Playwright page.clock.
   const SESSION_WARNING_MS = 30_000;
 
   const dialog = document.getElementById('session-dialog') as HTMLDialogElement;
@@ -43,7 +43,7 @@
     dialog.close();
   }
 
-  // Закрыть окно можно только кнопками: Esc и клик по фону не работают
+  // The dialog can only be closed with the buttons: Esc and backdrop clicks do nothing
   dialog.addEventListener('cancel', (event) => event.preventDefault());
   dialog.addEventListener('close', () => {
     if (closingByChoice) {
@@ -64,7 +64,7 @@
     location.replace('/');
   });
 
-  // Пока диалог открыт, активность таймер не сбрасывает — ответить надо кнопкой
+  // While the dialog is open, activity does not reset the timer — the user must answer with a button
   const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll', 'touchstart'];
   for (const type of ACTIVITY_EVENTS) {
     document.addEventListener(type, () => {

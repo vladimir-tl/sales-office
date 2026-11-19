@@ -262,7 +262,7 @@ const id = (part: string) => `${resource}-${part}`;
   .table-wrap { overflow-x: auto; }
   .table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .table th,
-  .table td { padding: 14px 20px; text-align: left; white-space: nowrap; }
+  .table :global(td) { padding: 14px 20px; text-align: left; white-space: nowrap; }
   .table th {
     color: var(--text-muted);
     font-weight: 500;
@@ -270,13 +270,15 @@ const id = (part: string) => `${resource}-${part}`;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
-  .table tbody tr + tr td { border-top: 1px solid var(--border); }
-  .table tbody tr:hover td { background: var(--field); }
-  .table .col--number,
-  .table .col--money { text-align: right; font-variant-numeric: tabular-nums; }
+  .table tbody :global(tr + tr td) { border-top: 1px solid var(--border); }
+  .table tbody :global(tr:hover td) { background: var(--field); }
+  .table th.col--number,
+  .table th.col--money,
+  .table :global(td.col--number),
+  .table :global(td.col--money) { text-align: right; font-variant-numeric: tabular-nums; }
   .table-foot { margin: 0; padding: 12px 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
 
-  .badge {
+  :global(.badge) {
     display: inline-block;
     padding: 3px 10px;
     border-radius: 999px;
@@ -286,7 +288,7 @@ const id = (part: string) => `${resource}-${part}`;
     background: var(--field);
     color: var(--text-muted);
   }
-  .badge--paid { background: var(--success-bg); color: var(--success); }
-  .badge--pending { background: rgb(255 176 32 / 0.16); color: #b36b00; }
-  .badge--cancelled { background: var(--danger-bg); color: var(--danger); }
+  :global(.badge--paid) { background: var(--success-bg); color: var(--success); }
+  :global(.badge--pending) { background: rgb(255 176 32 / 0.16); color: #b36b00; }
+  :global(.badge--cancelled) { background: var(--danger-bg); color: var(--danger); }
 </style>

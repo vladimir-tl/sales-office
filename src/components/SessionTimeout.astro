@@ -21,11 +21,11 @@
 <script>
   import { writeToken } from '../lib/auth';
 
-  // После минуты бездействия спрашиваем, продолжать ли сессию.
+  // После 30 секунд бездействия спрашиваем, продолжать ли сессию.
   // Любое действие пользователя (мышь, клавиатура, скролл, тач) перезапускает
   // отсчёт. Таймер обычный setTimeout, поэтому в тестах его можно
   // промотать через Playwright page.clock.
-  const SESSION_WARNING_MS = 60_000;
+  const SESSION_WARNING_MS = 30_000;
 
   const dialog = document.getElementById('session-dialog') as HTMLDialogElement;
   let timer: ReturnType<typeof setTimeout> | undefined;

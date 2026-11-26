@@ -18,11 +18,10 @@ test.describe('Login', { tag: '@login' }, () => {
     expect((await request).method()).toBe('POST');
   });
 
-  // Real login against the backend: LOGIN_USER / LOGIN_PASS from .env
-  test('logs in with real credentials', async ({ page }) => {
-    const user = process.env.LOGIN_USER ?? '';
-    const pass = process.env.LOGIN_PASS ?? '';
-    test.skip(!user || !pass, 'set LOGIN_USER and LOGIN_PASS');
+  // Skipped until the login token is mocked; then it won't need the real backend
+  test.skip('logs in with real credentials', async ({ page }) => {
+    const user = process.env.LOGIN_USER!;
+    const pass = process.env.LOGIN_PASS!;
 
     await login.login(user, pass);
 

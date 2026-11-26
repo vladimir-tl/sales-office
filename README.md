@@ -1,24 +1,24 @@
 # sales-office
 
-## Скрипты
+## Scripts
 
-| Команда                | Что делает                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------------- |
-| `npm run dev`          | Dev-сервер Astro для разработки                                                     |
-| `npm run test:server`  | Запускает приложение локально на `http://localhost:4322` для тестов (так делает CI) |
-| `npm run test:install` | Ставит Chromium для Playwright                                                      |
-| `npm run test:login`   | Тесты страницы логина (`@login`)                                                    |
-| `npm test`             | Все Playwright-тесты                                                                |
-| `npm run format:check` | Проверка форматирования Prettier                                                    |
+| Command                | What it does                                                             |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `npm run dev`          | Astro dev server for development                                         |
+| `npm run test:server`  | Runs the app locally on `http://localhost:4322` for tests (CI does this) |
+| `npm run test:install` | Installs Chromium for Playwright                                         |
+| `npm run test:login`   | Login page tests (`@login`)                                              |
+| `npm test`             | All Playwright tests                                                     |
+| `npm run format:check` | Prettier formatting check                                                |
 
-## Тесты локально, как в CI
+## Running tests locally like CI
 
-CI (`.github/workflows/testing-pipeline.yml`) поднимает приложение командой `npm run test:server` и прогоняет тесты на `localhost:4322`. Чтобы повторить у себя:
+CI (`.github/workflows/testing-pipeline.yml`) starts the app with `npm run test:server` and runs the tests against `localhost:4322`. To do the same locally:
 
 ```sh
-npm run test:install   # один раз
-npm run test:server    # терминал 1: приложение на порту 4322
-npm run test:login     # терминал 2: тесты
+npm run test:install   # once
+npm run test:server    # terminal 1: app on port 4322
+npm run test:login     # terminal 2: tests
 ```
 
-Порт фиксированный (`--strictPort`): если 4322 занят, сервер не запустится, а не переедет на другой порт.
+The port is fixed (`--strictPort`): if 4322 is taken, the server fails to start instead of moving to another port.

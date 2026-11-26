@@ -24,6 +24,9 @@ jobs:
 
       - run: npm ci
 
+      # Fail fast on formatting before spending time on browsers and tests
+      - run: npm run format:check
+
       - run: npx playwright install --with-deps chromium
 
       # BASE_URL is not set, so playwright.config.ts starts `astro dev` on localhost:4322.

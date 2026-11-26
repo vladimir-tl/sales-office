@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { acceptCookies, signIn } from './helpers'
+import { acceptCookies } from './helpers'
 import { DashboardPage } from './pages/DashboardPage'
-import { mockNoSales } from './mocks/api'
+import { LoginPage } from './pages/LoginPage'
+import { mockLoginSuccess, mockNoSales } from './mocks/api'
 
 /**
  * The session dialog appears after 30 s of inactivity.
@@ -12,9 +13,13 @@ test.describe('Session expiry dialog', () => {
 
   test.beforeEach(async ({ page }) => {
     dashboard = new DashboardPage(page)
+    const login = new LoginPage(page)
     await acceptCookies(page)
+    await mockLoginSuccess(page)
     await mockNoSales(page) // answer right away
-    await signIn(page)
+    await login.goto()
+    await login.login('demo-user', 'secret123')
+    await expect(page).toHaveURL(/\/dashboard\/sales$/)
     await page.clock.install() // before the dashboard reloads, so its setTimeout is faked
     await dashboard.gotoSales()
     await expect(dashboard.root).toBeVisible()

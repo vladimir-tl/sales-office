@@ -1,5 +1,4 @@
-import { expect, type Page } from '@playwright/test'
-import { LoginPage } from './pages/LoginPage'
+import type { Page } from '@playwright/test'
 import { CONSENT_KEY, CONSENT_VERSION } from '../src/lib/consent'
 
 /**
@@ -35,19 +34,4 @@ export function fakeJwt({ sub = 'demo-user', expiresInSec = 60 * 60 } = {}) {
   const header = encode({ alg: 'HS256', typ: 'JWT' })
   const payload = encode({ sub, iat: now, exp: now + expiresInSec })
   return `${header}.${payload}.fake-signature`
-}
-
-/**
- * Real login through the form: POST /api/login/auth → backend /login/student.
- * Credentials come from LOGIN_USER / LOGIN_PASS (.env). Ends on /dashboard/sales.
- */
-export async function signIn(page: Page) {
-  const username = process.env.LOGIN_USER
-  const password = process.env.LOGIN_PASS
-  if (!username || !password) throw new Error('Set LOGIN_USER and LOGIN_PASS in .env')
-
-  const login = new LoginPage(page)
-  await login.goto()
-  await login.login(username, password)
-  await expect(page).toHaveURL(/\/dashboard\/sales$/)
 }

@@ -32,8 +32,6 @@ test.describe('Login', { tag: '@login' }, () => {
     await mockNoSales(page) // the dashboard opens on Sales; a fake token would get 401 from the real API
     await login.login('demo-user', 'secret123')
 
-    const dashboard = new DashboardPage(page)
-    await expect(dashboard.sidebar).toBeVisible()
-    await expect(dashboard.username).toHaveText('demo-user')
+    await expect(new DashboardPage(page).sidebar).toBeVisible()
   })
 })

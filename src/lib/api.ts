@@ -34,7 +34,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiGet<T>(url: string, token: string, timeoutMs = REQUEST_TIMEOUT_MS): Promise<T> {
+export async function apiGet<T>(
+  url: string,
+  token: string,
+  timeoutMs = REQUEST_TIMEOUT_MS,
+): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -46,7 +50,10 @@ export async function apiGet<T>(url: string, token: string, timeoutMs = REQUEST_
     });
   } catch (err) {
     if (controller.signal.aborted) {
-      throw new ApiError('timeout', `The server didn't respond within ${timeoutMs / 1000} seconds.`);
+      throw new ApiError(
+        'timeout',
+        `The server didn't respond within ${timeoutMs / 1000} seconds.`,
+      );
     }
     throw new ApiError('network', "Couldn't reach the server. Check your internet connection.");
   } finally {
@@ -54,10 +61,18 @@ export async function apiGet<T>(url: string, token: string, timeoutMs = REQUEST_
   }
 
   if (res.status === 401 || res.status === 403) {
-    throw new ApiError('unauthorized', 'Your session has expired. Please log in again.', res.status);
+    throw new ApiError(
+      'unauthorized',
+      'Your session has expired. Please log in again.',
+      res.status,
+    );
   }
   if (!res.ok) {
-    throw new ApiError('http', `Something went wrong on our side (${res.status}). Please try again later.`, res.status);
+    throw new ApiError(
+      'http',
+      `Something went wrong on our side (${res.status}). Please try again later.`,
+      res.status,
+    );
   }
 
   try {

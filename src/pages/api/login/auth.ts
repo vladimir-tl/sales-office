@@ -4,7 +4,10 @@ import type { APIRoute } from 'astro';
  * Same-origin proxy for login: the browser calls POST /api/login/auth
  * (so DevTools shows "auth"), the Worker forwards it to the backend's /login/student.
  */
-const BACKEND = (import.meta.env.PUBLIC_API_URL || 'https://backend.tallinn-learning.ee').replace(/\/$/, '');
+const BACKEND = (import.meta.env.PUBLIC_API_URL || 'https://backend.tallinn-learning.ee').replace(
+  /\/$/,
+  '',
+);
 const UPSTREAM = `${BACKEND}/login/student`;
 
 export const prerender = false;

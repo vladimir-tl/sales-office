@@ -18,7 +18,6 @@ test.describe('Login', { tag: '@login' }, () => {
     expect((await request).method()).toBe('POST');
   });
 
-
   // Real login against the backend: LOGIN_USER / LOGIN_PASS from .env
   test('logs in with real credentials', async ({ page }) => {
     const user = process.env.LOGIN_USER ?? '';

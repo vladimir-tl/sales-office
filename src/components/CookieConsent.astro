@@ -9,10 +9,12 @@
   aria-describedby="cc-text"
   data-testid="cookie-dialog"
 >
-  <h2 id="cc-title" class="cc__title" data-testid="cookie-title">We use cookies</h2>
+  <h2 id="cc-title" class="cc__title" data-testid="cookie-title">
+    We use cookies
+  </h2>
   <p id="cc-text" class="cc__text" data-testid="cookie-text">
-    Essential cookies keep the site working and let you sign in.
-    Analytics and marketing cookies are only used with your consent.
+    Essential cookies keep the site working and let you sign in. Analytics and marketing cookies are
+    only used with your consent.
   </p>
 
   <div id="cc-prefs" class="cc__prefs" data-testid="cookie-preferences" hidden>
@@ -21,30 +23,73 @@
         <strong>Essential</strong>
         <small>Sign-in, security and remembering your choice. Always on.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" checked disabled data-testid="cookie-essential-toggle" />
+      <input
+        type="checkbox"
+        role="switch"
+        class="switch"
+        checked
+        disabled
+        data-testid="cookie-essential-toggle"
+      />
     </label>
     <label class="cc__row">
       <span class="cc__row-text">
         <strong>Analytics</strong>
         <small>Help us understand how the site is used so we can improve it.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" name="analytics" data-testid="cookie-analytics-toggle" />
+      <input
+        type="checkbox"
+        role="switch"
+        class="switch"
+        name="analytics"
+        data-testid="cookie-analytics-toggle"
+      />
     </label>
     <label class="cc__row">
       <span class="cc__row-text">
         <strong>Marketing</strong>
         <small>Let us show you relevant ads on other websites.</small>
       </span>
-      <input type="checkbox" role="switch" class="switch" name="marketing" data-testid="cookie-marketing-toggle" />
+      <input
+        type="checkbox"
+        role="switch"
+        class="switch"
+        name="marketing"
+        data-testid="cookie-marketing-toggle"
+      />
     </label>
   </div>
 
   <div class="cc__actions">
-    <button type="button" class="btn btn--link" data-cc="customize" data-testid="cookie-customize">Customize</button>
+    <button type="button" class="btn btn--link" data-cc="customize" data-testid="cookie-customize">
+      Customize
+    </button>
     <span class="cc__spacer"></span>
-    <button type="button" class="btn btn--secondary btn--sm" data-cc="reject" data-testid="cookie-reject-all">Reject all</button>
-    <button type="button" class="btn btn--primary btn--sm" data-cc="accept" data-testid="cookie-accept-all">Accept all</button>
-    <button type="button" class="btn btn--primary btn--sm" data-cc="save" data-testid="cookie-save" hidden>Save choices</button>
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      data-cc="reject"
+      data-testid="cookie-reject-all"
+    >
+      Reject all
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary btn--sm"
+      data-cc="accept"
+      data-testid="cookie-accept-all"
+    >
+      Accept all
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary btn--sm"
+      data-cc="save"
+      data-testid="cookie-save"
+      hidden
+    >
+      Save choices
+    </button>
   </div>
 </dialog>
 
@@ -132,14 +177,19 @@
     box-shadow: var(--shadow-lg);
     animation: cc-in 0.25s ease-out;
   }
-  .cc:focus { outline: none; }
+  .cc:focus {
+    outline: none;
+  }
   .cc::backdrop {
     background: rgb(10 12 16 / 0.45);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
   @keyframes cc-in {
-    from { opacity: 0; transform: translateY(12px); }
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
   }
 
   .cc__title {
@@ -160,7 +210,9 @@
     gap: 4px;
     margin-top: 16px;
   }
-  .cc__prefs[hidden] { display: none; }
+  .cc__prefs[hidden] {
+    display: none;
+  }
   .cc__row {
     display: flex;
     align-items: center;
@@ -170,7 +222,9 @@
     background: var(--field);
     cursor: pointer;
   }
-  .cc__row:has(input:disabled) { cursor: default; }
+  .cc__row:has(input:disabled) {
+    cursor: default;
+  }
   .cc__row-text {
     display: grid;
     gap: 2px;
@@ -207,10 +261,20 @@
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
     transition: transform 0.2s;
   }
-  .switch:checked { background: var(--accent); }
-  .switch:checked::after { transform: translateX(18px); }
-  .switch:disabled { opacity: 0.55; cursor: not-allowed; }
-  .switch:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .switch:checked {
+    background: var(--accent);
+  }
+  .switch:checked::after {
+    transform: translateX(18px);
+  }
+  .switch:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .switch:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
 
   .cc__actions {
     display: flex;
@@ -219,13 +283,27 @@
     gap: 8px;
     margin-top: 20px;
   }
-  .cc__spacer { flex: 1; }
-  .cc__actions [hidden] { display: none; }
+  .cc__spacer {
+    flex: 1;
+  }
+  .cc__actions [hidden] {
+    display: none;
+  }
 
   @media (max-width: 480px) {
-    .cc { padding: 20px; border-radius: 20px; }
-    .cc__actions .btn--sm { flex: 1; }
-    .cc__spacer { display: none; }
-    .cc__actions .btn--link { width: 100%; order: 3; }
+    .cc {
+      padding: 20px;
+      border-radius: 20px;
+    }
+    .cc__actions .btn--sm {
+      flex: 1;
+    }
+    .cc__spacer {
+      display: none;
+    }
+    .cc__actions .btn--link {
+      width: 100%;
+      order: 3;
+    }
   }
 </style>

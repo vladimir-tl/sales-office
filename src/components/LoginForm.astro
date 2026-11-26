@@ -4,7 +4,13 @@ const endpoint = '/api/login/auth';
 ---
 
 <div class="login">
-  <form id="login-form" class="login__form" novalidate data-endpoint={endpoint} data-testid="login-form">
+  <form
+    id="login-form"
+    class="login__form"
+    novalidate
+    data-endpoint={endpoint}
+    data-testid="login-form"
+  >
     <header class="login__head">
       <h1 data-testid="login-title">Welcome back</h1>
       <p>Log in to your Sales Office account</p>
@@ -44,19 +50,27 @@ const endpoint = '/api/login/auth';
         aria-label="Show password"
         aria-pressed="false"
       >
-        <svg class="icon-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5Zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-2.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
-        <svg class="icon-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="m3.3 2 18.7 18.7-1.3 1.3-3.6-3.6A11.4 11.4 0 0 1 12 19C6.5 19 2.7 14.8 1.5 12c.6-1.4 1.8-3.2 3.5-4.6L2 3.3 3.3 2Zm4.4 6.9A4.5 4.5 0 0 0 15 14.3l-1.9-1.9a2 2 0 0 1-2.5-2.5L7.7 8.9ZM12 5c5.5 0 9.3 4.2 10.5 7a13 13 0 0 1-3.2 4.3l-3-3A4.5 4.5 0 0 0 10.7 7.7L8.6 5.6C9.6 5.2 10.8 5 12 5Z"/></svg>
+        <svg class="icon-show" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5Zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-2.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+        </svg>
+        <svg class="icon-hide" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3.3 2 18.7 18.7-1.3 1.3-3.6-3.6A11.4 11.4 0 0 1 12 19C6.5 19 2.7 14.8 1.5 12c.6-1.4 1.8-3.2 3.5-4.6L2 3.3 3.3 2Zm4.4 6.9A4.5 4.5 0 0 0 15 14.3l-1.9-1.9a2 2 0 0 1-2.5-2.5L7.7 8.9ZM12 5c5.5 0 9.3 4.2 10.5 7a13 13 0 0 1-3.2 4.3l-3-3A4.5 4.5 0 0 0 10.7 7.7L8.6 5.6C9.6 5.2 10.8 5 12 5Z" />
+        </svg>
       </button>
     </div>
 
     <p id="login-error" class="login__error" role="alert" data-testid="login-error" hidden></p>
 
-    <button type="submit" class="btn btn--primary btn--block" id="login-submit" data-testid="login-submit">
+    <button
+      type="submit"
+      class="btn btn--primary btn--block"
+      id="login-submit"
+      data-testid="login-submit"
+    >
       <span class="btn__label">Log in</span>
       <span class="spinner" aria-hidden="true"></span>
     </button>
   </form>
-
 </div>
 
 <script>
@@ -127,7 +141,9 @@ const endpoint = '/api/login/auth';
         throw new LoginError('Incorrect username or password');
       }
       if (!res.ok) {
-        throw new LoginError(`Something went wrong on our side (${res.status}). Please try again later.`);
+        throw new LoginError(
+          `Something went wrong on our side (${res.status}). Please try again later.`,
+        );
       }
 
       const token = (await res.text()).trim();
@@ -147,9 +163,14 @@ const endpoint = '/api/login/auth';
 </script>
 
 <style>
-  .login { width: 100%; max-width: 400px; }
+  .login {
+    width: 100%;
+    max-width: 400px;
+  }
 
-  .login__head { margin-bottom: 32px; }
+  .login__head {
+    margin-bottom: 32px;
+  }
   .login__head h1 {
     margin: 0 0 8px;
     font-size: clamp(32px, 5vw, 40px);
@@ -163,10 +184,17 @@ const endpoint = '/api/login/auth';
     font-size: 16px;
   }
 
-  .login__form { display: grid; gap: 12px; }
-  .login__form[hidden] { display: none; }
+  .login__form {
+    display: grid;
+    gap: 12px;
+  }
+  .login__form[hidden] {
+    display: none;
+  }
 
-  .field { position: relative; }
+  .field {
+    position: relative;
+  }
   .field input {
     width: 100%;
     height: 60px;
@@ -178,12 +206,23 @@ const endpoint = '/api/login/auth';
     border: 2px solid transparent;
     border-radius: 16px;
     outline: none;
-    transition: border-color 0.15s, background 0.15s;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
   }
-  .field--password input { padding-right: 56px; }
-  .field input:hover { background: var(--field-hover); }
-  .field input:focus { border-color: var(--accent); background: var(--surface); }
-  .is-invalid .field input { border-color: var(--danger); }
+  .field--password input {
+    padding-right: 56px;
+  }
+  .field input:hover {
+    background: var(--field-hover);
+  }
+  .field input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+  .is-invalid .field input {
+    border-color: var(--danger);
+  }
 
   .field label {
     position: absolute;
@@ -193,7 +232,10 @@ const endpoint = '/api/login/auth';
     color: var(--text-muted);
     font-size: 16px;
     pointer-events: none;
-    transition: top 0.15s, font-size 0.15s, transform 0.15s;
+    transition:
+      top 0.15s,
+      font-size 0.15s,
+      transform 0.15s;
   }
   .field input:focus + label,
   .field input:not(:placeholder-shown) + label {
@@ -218,12 +260,24 @@ const endpoint = '/api/login/auth';
     color: var(--text-muted);
     cursor: pointer;
   }
-  .field__toggle:hover { color: var(--text); }
-  .field__toggle:focus-visible { outline: 3px solid var(--focus); }
-  .field__toggle svg { width: 22px; height: 22px; fill: currentColor; }
+  .field__toggle:hover {
+    color: var(--text);
+  }
+  .field__toggle:focus-visible {
+    outline: 3px solid var(--focus);
+  }
+  .field__toggle svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
   .field__toggle .icon-hide,
-  .field__toggle[aria-pressed='true'] .icon-show { display: none; }
-  .field__toggle[aria-pressed='true'] .icon-hide { display: block; }
+  .field__toggle[aria-pressed='true'] .icon-show {
+    display: none;
+  }
+  .field__toggle[aria-pressed='true'] .icon-hide {
+    display: block;
+  }
 
   .login__error {
     margin: 0;
@@ -233,8 +287,11 @@ const endpoint = '/api/login/auth';
     background: var(--danger-bg);
     border-radius: 12px;
   }
-  .login__error[hidden] { display: none; }
+  .login__error[hidden] {
+    display: none;
+  }
 
-  .login__form .btn--block { margin-top: 12px; }
-
+  .login__form .btn--block {
+    margin-top: 12px;
+  }
 </style>

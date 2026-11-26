@@ -9,14 +9,16 @@ try {
 
 // Astro runs one dev server per project; 4321 is often taken by other projects
 const PORT = Number(process.env.PORT ?? 4322);
-const baseURL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
+const baseURL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: process.env.CI
+    ? [['github'], ['html', { open: 'never' }]]
+    : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -29,7 +31,7 @@ export default defineConfig({
     : {
         command: `npx astro dev --port ${PORT} --strictPort`,
         url: baseURL,
-        reuseExistingServer: true, // reuse this project's running `astro dev`
+        reuseExistingServer: !process.env.CI, // locally reuse a running `astro dev`; CI starts a fresh one
         timeout: 120_000,
       },
 });

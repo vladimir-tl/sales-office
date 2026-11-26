@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { acceptCookies } from './helpers';
 import { LoginPage } from './pages/LoginPage';
 
-test.describe('Login', () => {
+test.describe('Login', { tag: '@login' }, () => {
   let login: LoginPage;
 
   test.beforeEach(async ({ page }) => {

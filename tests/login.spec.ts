@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { acceptCookies } from './helpers';
 import { LoginPage } from './pages/LoginPage';
 
-test.describe('Login', () => {
+test.describe('Login', { tag: '@login' }, () => {
   let login: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -17,7 +17,6 @@ test.describe('Login', () => {
     await login.login('demo-user', 'secret123');
     expect((await request).method()).toBe('POST');
   });
-
 
   // Real login against the backend: LOGIN_USER / LOGIN_PASS from .env
   test('logs in with real credentials', async ({ page }) => {

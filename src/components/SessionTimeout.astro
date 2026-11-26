@@ -10,11 +10,29 @@
   aria-describedby="session-text"
   data-testid="session-dialog"
 >
-  <h2 id="session-title" class="sd__title" data-testid="session-title">Your session is about to expire</h2>
-  <p id="session-text" class="sd__text" data-testid="session-text">Do you want to continue working?</p>
+  <h2 id="session-title" class="sd__title" data-testid="session-title">
+    Your session is about to expire
+  </h2>
+  <p id="session-text" class="sd__text" data-testid="session-text">
+    Do you want to continue working?
+  </p>
   <div class="sd__actions">
-    <button type="button" class="btn btn--secondary btn--sm" id="session-no" data-testid="session-no">No</button>
-    <button type="button" class="btn btn--primary btn--sm" id="session-yes" data-testid="session-yes">Yes</button>
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      id="session-no"
+      data-testid="session-no"
+    >
+      No
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary btn--sm"
+      id="session-yes"
+      data-testid="session-yes"
+    >
+      Yes
+    </button>
   </div>
 </dialog>
 
@@ -67,9 +85,13 @@
   // While the dialog is open, activity does not reset the timer — the user must answer with a button
   const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll', 'touchstart'];
   for (const type of ACTIVITY_EVENTS) {
-    document.addEventListener(type, () => {
-      if (!dialog.open) schedule();
-    }, { capture: true, passive: true });
+    document.addEventListener(
+      type,
+      () => {
+        if (!dialog.open) schedule();
+      },
+      { capture: true, passive: true },
+    );
   }
 
   schedule();
@@ -86,13 +108,27 @@
     border-radius: 24px;
     box-shadow: var(--shadow-lg);
   }
-  .sd:focus { outline: none; }
+  .sd:focus {
+    outline: none;
+  }
   .sd::backdrop {
     background: rgb(10 12 16 / 0.45);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  .sd__title { margin: 0 0 8px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-  .sd__text { margin: 0 0 20px; color: var(--text-muted); }
-  .sd__actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .sd__title {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .sd__text {
+    margin: 0 0 20px;
+    color: var(--text-muted);
+  }
+  .sd__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 </style>

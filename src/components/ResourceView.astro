@@ -31,25 +31,61 @@ const id = (part: string) => `${resource}-${part}`;
       <h1 data-testid={id('title')}>{title}</h1>
       {subtitle && <p>{subtitle}</p>}
     </div>
-    <button type="button" class="btn btn--secondary btn--sm" data-action="reload" data-testid={id('reload')}>
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      data-action="reload"
+      data-testid={id('reload')}
+    >
       Refresh
     </button>
   </header>
 
   <div class="panel">
-    <div class="state state--loading" data-state-pane="loading" role="status" aria-live="polite" data-testid={id('loading')}>
-      <div class="progress" aria-hidden="true"><span></span></div>
+    <div
+      class="state state--loading"
+      data-state-pane="loading"
+      role="status"
+      aria-live="polite"
+      data-testid={id('loading')}
+    >
+      <div class="progress" aria-hidden="true">
+        <span></span>
+      </div>
       <span class="spinner spinner--lg" aria-hidden="true"></span>
       <p>Loading {title.toLowerCase()}…</p>
     </div>
 
-    <div class="state state--error" data-state-pane="error" role="alert" hidden data-testid={id('error')}>
-      <div class="state__icon" aria-hidden="true">!</div>
+    <div
+      class="state state--error"
+      data-state-pane="error"
+      role="alert"
+      hidden
+      data-testid={id('error')}
+    >
+      <div class="state__icon" aria-hidden="true">
+        !
+      </div>
       <p class="state__title">Couldn't load {title.toLowerCase()}</p>
       <p class="state__text" data-slot="error-message" data-testid={id('error-message')}></p>
       <div class="state__actions">
-        <button type="button" class="btn btn--primary btn--sm" data-action="reload" data-testid={id('retry')}>Try again</button>
-        <a class="btn btn--secondary btn--sm" href="/" data-slot="relogin" hidden data-testid={id('relogin')}>Log in again</a>
+        <button
+          type="button"
+          class="btn btn--primary btn--sm"
+          data-action="reload"
+          data-testid={id('retry')}
+        >
+          Try again
+        </button>
+        <a
+          class="btn btn--secondary btn--sm"
+          href="/"
+          data-slot="relogin"
+          hidden
+          data-testid={id('relogin')}
+        >
+          Log in again
+        </a>
       </div>
     </div>
 
@@ -63,7 +99,9 @@ const id = (part: string) => `${resource}-${part}`;
         <thead>
           <tr>
             {columns.map((c) => (
-              <th class={`col--${c.format ?? 'text'}`} data-testid={id(`col-${c.key}`)}>{c.label}</th>
+              <th class={`col--${c.format ?? 'text'}`} data-testid={id(`col-${c.key}`)}>
+                {c.label}
+              </th>
             ))}
           </tr>
         </thead>
@@ -95,10 +133,14 @@ const id = (part: string) => `${resource}-${part}`;
       case 'number':
         return typeof value === 'number' ? value.toLocaleString('en-GB') : String(value);
       case 'money':
-        return typeof value === 'number' ? money(value, String(row.currency ?? 'EUR')) : String(value);
+        return typeof value === 'number'
+          ? money(value, String(row.currency ?? 'EUR'))
+          : String(value);
       case 'date': {
         const d = new Date(String(value));
-        return isNaN(d.getTime()) ? String(value) : d.toLocaleDateString('en-GB', { dateStyle: 'medium' });
+        return isNaN(d.getTime())
+          ? String(value)
+          : d.toLocaleDateString('en-GB', { dateStyle: 'medium' });
       }
       case 'boolean':
         return value ? 'Yes' : 'No';
@@ -168,7 +210,8 @@ const id = (part: string) => `${resource}-${part}`;
       try {
         const data = await apiGet<unknown>(endpoint, token);
         if (current !== requestId) return;
-        if (!Array.isArray(data)) throw new ApiError('invalid', 'The server sent an unexpected response.');
+        if (!Array.isArray(data))
+          throw new ApiError('invalid', 'The server sent an unexpected response.');
         if (data.length === 0) {
           setState('empty');
           return;
@@ -177,7 +220,8 @@ const id = (part: string) => `${resource}-${part}`;
         setState('ready');
       } catch (err) {
         if (current !== requestId) return;
-        const apiErr = err instanceof ApiError ? err : new ApiError('network', 'Something went wrong.');
+        const apiErr =
+          err instanceof ApiError ? err : new ApiError('network', 'Something went wrong.');
         root.dataset.errorKind = apiErr.kind;
         errorEl.textContent = apiErr.message;
         if (apiErr.kind === 'unauthorized') {
@@ -196,11 +240,30 @@ const id = (part: string) => `${resource}-${part}`;
 </script>
 
 <style>
-  .resource { display: grid; gap: 24px; max-width: 1200px; }
+  .resource {
+    display: grid;
+    gap: 24px;
+    max-width: 1200px;
+  }
 
-  .resource__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .resource__head h1 { margin: 0; font-size: clamp(28px, 4vw, 36px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
-  .resource__head p { margin: 6px 0 0; color: var(--text-muted); }
+  .resource__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .resource__head h1 {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .resource__head p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+  }
 
   .panel {
     position: relative;
@@ -210,7 +273,9 @@ const id = (part: string) => `${resource}-${part}`;
     overflow: hidden;
   }
 
-  [data-state-pane][hidden] { display: none !important; }
+  [data-state-pane][hidden] {
+    display: none !important;
+  }
 
   .state {
     display: grid;
@@ -220,10 +285,25 @@ const id = (part: string) => `${resource}-${part}`;
     text-align: center;
     color: var(--text-muted);
   }
-  .state p { margin: 0; }
-  .state__title { color: var(--text); font-weight: 600; font-size: 17px; }
-  .state__text { max-width: 420px; font-size: 14px; }
-  .state__actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+  .state p {
+    margin: 0;
+  }
+  .state__title {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .state__text {
+    max-width: 420px;
+    font-size: 14px;
+  }
+  .state__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
   .state__icon {
     display: grid;
     place-items: center;
@@ -246,7 +326,13 @@ const id = (part: string) => `${resource}-${part}`;
     border-width: 3px;
   }
 
-  .progress { position: absolute; inset: 0 0 auto; height: 3px; overflow: hidden; background: var(--field); }
+  .progress {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    overflow: hidden;
+    background: var(--field);
+  }
   .progress span {
     position: absolute;
     inset: 0 auto 0 0;
@@ -255,14 +341,28 @@ const id = (part: string) => `${resource}-${part}`;
     animation: indeterminate 1.4s ease-in-out infinite;
   }
   @keyframes indeterminate {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(250%); }
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
   }
 
-  .table-wrap { overflow-x: auto; }
-  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
   .table th,
-  .table :global(td) { padding: 14px 20px; text-align: left; white-space: nowrap; }
+  .table :global(td) {
+    padding: 14px 20px;
+    text-align: left;
+    white-space: nowrap;
+  }
   .table th {
     color: var(--text-muted);
     font-weight: 500;
@@ -270,13 +370,26 @@ const id = (part: string) => `${resource}-${part}`;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
-  .table tbody :global(tr + tr td) { border-top: 1px solid var(--border); }
-  .table tbody :global(tr:hover td) { background: var(--field); }
+  .table tbody :global(tr + tr td) {
+    border-top: 1px solid var(--border);
+  }
+  .table tbody :global(tr:hover td) {
+    background: var(--field);
+  }
   .table th.col--number,
   .table th.col--money,
   .table :global(td.col--number),
-  .table :global(td.col--money) { text-align: right; font-variant-numeric: tabular-nums; }
-  .table-foot { margin: 0; padding: 12px 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
+  .table :global(td.col--money) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .table-foot {
+    margin: 0;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
 
   :global(.badge) {
     display: inline-block;
@@ -288,7 +401,16 @@ const id = (part: string) => `${resource}-${part}`;
     background: var(--field);
     color: var(--text-muted);
   }
-  :global(.badge--paid) { background: var(--success-bg); color: var(--success); }
-  :global(.badge--pending) { background: rgb(255 176 32 / 0.16); color: #b36b00; }
-  :global(.badge--cancelled) { background: var(--danger-bg); color: var(--danger); }
+  :global(.badge--paid) {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  :global(.badge--pending) {
+    background: rgb(255 176 32 / 0.16);
+    color: #b36b00;
+  }
+  :global(.badge--cancelled) {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
 </style>

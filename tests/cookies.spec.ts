@@ -8,7 +8,9 @@ test('shows the cookie dialog without cookie_consent', async ({ page }) => {
   await expect(login.cookieDialog.dialog).toBeVisible();
 });
 
-test('hides the cookie dialog with cookie_consent and keeps the login form usable', async ({ page }) => {
+test('hides the cookie dialog with cookie_consent and keeps the login form usable', async ({
+  page,
+}) => {
   const login = new LoginPage(page);
   await acceptCookies(page);
   await login.goto();

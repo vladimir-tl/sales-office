@@ -41,9 +41,7 @@ function parse(raw: string | null | undefined): Consent | null {
 }
 
 function readCookie(name: string): string | null {
-  const match = document.cookie
-    .split('; ')
-    .find((part) => part.startsWith(`${name}=`));
+  const match = document.cookie.split('; ').find((part) => part.startsWith(`${name}=`));
   return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
 }
 

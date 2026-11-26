@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import type { Product, Sale } from '../../src/lib/api'
+import { fakeJwt } from '../helpers'
 
 /** Simple mocks for the data API, shaped by contracts/openapi.yaml */
 
@@ -78,6 +79,12 @@ const fourProducts: Product[] = [
 ]
 
 // ---- One named mock per scenario ----
+
+/** POST /api/login/auth → 200, pseudo JWT as plain text (like the real backend) */
+export const mockLoginSuccess = (page: Page, sub = 'demo-user') =>
+  page.route('**/api/login/auth', (route) =>
+    route.fulfill({ contentType: 'text/plain', body: fakeJwt({ sub }) }),
+  )
 
 /** GET /api/sales → 200, 3 sales */
 export const mockThreeSales = (page: Page) =>

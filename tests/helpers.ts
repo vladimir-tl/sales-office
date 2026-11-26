@@ -24,6 +24,20 @@ export async function acceptCookies(page: Page) {
 }
 
 /**
+ * Pseudo JWT for mocks: `header.payload.signature` in base64url.
+ * The app only decodes the payload (`sub` → sidebar name, `exp` → expiry)
+ * and never checks the signature, so a fake one is enough.
+ * `expiresInSec` counts from now; pass a negative value for an expired token.
+ */
+export function fakeJwt({ sub = 'demo-user', expiresInSec = 60 * 60 } = {}) {
+  const encode = (data: object) => Buffer.from(JSON.stringify(data)).toString('base64url')
+  const now = Math.floor(Date.now() / 1000)
+  const header = encode({ alg: 'HS256', typ: 'JWT' })
+  const payload = encode({ sub, iat: now, exp: now + expiresInSec })
+  return `${header}.${payload}.fake-signature`
+}
+
+/**
  * Real login through the form: POST /api/login/auth → backend /login/student.
  * Credentials come from LOGIN_USER / LOGIN_PASS (.env). Ends on /dashboard/sales.
  */

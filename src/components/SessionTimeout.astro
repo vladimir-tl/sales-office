@@ -37,64 +37,64 @@
 </dialog>
 
 <script>
-  import { writeToken } from '../lib/auth';
+  import { writeToken } from '../lib/auth'
 
   // After 30 seconds of inactivity, ask whether to continue the session.
   // Any user activity (mouse, keyboard, scroll, touch) restarts the
   // countdown. The timer is a plain setTimeout, so tests can fast-forward
   // it with Playwright page.clock.
-  const SESSION_WARNING_MS = 30_000;
+  const SESSION_WARNING_MS = 30_000
 
-  const dialog = document.getElementById('session-dialog') as HTMLDialogElement;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  let closingByChoice = false;
+  const dialog = document.getElementById('session-dialog') as HTMLDialogElement
+  let timer: ReturnType<typeof setTimeout> | undefined
+  let closingByChoice = false
 
   function schedule() {
-    clearTimeout(timer);
+    clearTimeout(timer)
     timer = setTimeout(() => {
-      if (!dialog.open) dialog.showModal();
-    }, SESSION_WARNING_MS);
+      if (!dialog.open) dialog.showModal()
+    }, SESSION_WARNING_MS)
   }
 
   function close() {
-    closingByChoice = true;
-    dialog.close();
+    closingByChoice = true
+    dialog.close()
   }
 
   // The dialog can only be closed with the buttons: Esc and backdrop clicks do nothing
-  dialog.addEventListener('cancel', (event) => event.preventDefault());
+  dialog.addEventListener('cancel', (event) => event.preventDefault())
   dialog.addEventListener('close', () => {
     if (closingByChoice) {
-      closingByChoice = false;
-      return;
+      closingByChoice = false
+      return
     }
-    dialog.showModal();
-  });
+    dialog.showModal()
+  })
 
   document.getElementById('session-yes')!.addEventListener('click', () => {
-    close();
-    schedule();
-  });
+    close()
+    schedule()
+  })
   document.getElementById('session-no')!.addEventListener('click', () => {
-    clearTimeout(timer);
-    close();
-    writeToken(null);
-    location.replace('/');
-  });
+    clearTimeout(timer)
+    close()
+    writeToken(null)
+    location.replace('/')
+  })
 
   // While the dialog is open, activity does not reset the timer — the user must answer with a button
-  const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll', 'touchstart'];
+  const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll', 'touchstart']
   for (const type of ACTIVITY_EVENTS) {
     document.addEventListener(
       type,
       () => {
-        if (!dialog.open) schedule();
+        if (!dialog.open) schedule()
       },
       { capture: true, passive: true },
-    );
+    )
   }
 
-  schedule();
+  schedule()
 </script>
 
 <style>

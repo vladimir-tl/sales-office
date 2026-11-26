@@ -94,73 +94,73 @@
 </dialog>
 
 <script>
-  import { getConsent, saveConsent } from '../lib/consent';
+  import { getConsent, saveConsent } from '../lib/consent'
 
-  const banner = document.getElementById('cc') as HTMLDialogElement;
-  const prefs = document.getElementById('cc-prefs') as HTMLDivElement;
-  const analytics = banner.querySelector<HTMLInputElement>('input[name="analytics"]')!;
-  const marketing = banner.querySelector<HTMLInputElement>('input[name="marketing"]')!;
-  const btn = (name: string) => banner.querySelector<HTMLButtonElement>(`[data-cc="${name}"]`)!;
+  const banner = document.getElementById('cc') as HTMLDialogElement
+  const prefs = document.getElementById('cc-prefs') as HTMLDivElement
+  const analytics = banner.querySelector<HTMLInputElement>('input[name="analytics"]')!
+  const marketing = banner.querySelector<HTMLInputElement>('input[name="marketing"]')!
+  const btn = (name: string) => banner.querySelector<HTMLButtonElement>(`[data-cc="${name}"]`)!
 
   function setExpanded(expanded: boolean) {
-    prefs.hidden = !expanded;
-    btn('customize').hidden = expanded;
-    btn('accept').hidden = expanded;
-    btn('save').hidden = !expanded;
+    prefs.hidden = !expanded
+    btn('customize').hidden = expanded
+    btn('accept').hidden = expanded
+    btn('save').hidden = !expanded
   }
 
   function open(expanded = false) {
-    const current = getConsent();
-    analytics.checked = current?.analytics ?? false;
-    marketing.checked = current?.marketing ?? false;
-    setExpanded(expanded);
+    const current = getConsent()
+    analytics.checked = current?.analytics ?? false
+    marketing.checked = current?.marketing ?? false
+    setExpanded(expanded)
     // showModal(): the background becomes inert and focus is trapped in the dialog —
     // the login form can't be used until a choice is made
-    if (!banner.open) banner.showModal();
+    if (!banner.open) banner.showModal()
   }
 
   // The dialog can only be closed via the choice buttons — close() sets the flag
-  let closingByChoice = false;
+  let closingByChoice = false
 
   function close() {
-    closingByChoice = true;
-    banner.close();
+    closingByChoice = true
+    banner.close()
   }
 
   // Esc never closes the dialog (plus closedby="none" in the markup)
   banner.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') event.preventDefault();
-  });
-  banner.addEventListener('cancel', (event) => event.preventDefault());
+    if (event.key === 'Escape') event.preventDefault()
+  })
+  banner.addEventListener('cancel', (event) => event.preventDefault())
   // Safety net: on a repeated Esc, Chrome may close the <dialog> despite
   // preventDefault. If it was closed other than via a button, reopen it.
   banner.addEventListener('close', () => {
     if (closingByChoice) {
-      closingByChoice = false;
-      return;
+      closingByChoice = false
+      return
     }
-    banner.showModal();
-  });
+    banner.showModal()
+  })
 
   btn('accept').addEventListener('click', () => {
-    saveConsent({ analytics: true, marketing: true });
-    close();
-  });
+    saveConsent({ analytics: true, marketing: true })
+    close()
+  })
   btn('reject').addEventListener('click', () => {
-    saveConsent({ analytics: false, marketing: false });
-    close();
-  });
+    saveConsent({ analytics: false, marketing: false })
+    close()
+  })
   btn('save').addEventListener('click', () => {
-    saveConsent({ analytics: analytics.checked, marketing: marketing.checked });
-    close();
-  });
-  btn('customize').addEventListener('click', () => setExpanded(true));
+    saveConsent({ analytics: analytics.checked, marketing: marketing.checked })
+    close()
+  })
+  btn('customize').addEventListener('click', () => setExpanded(true))
   // Any element with data-cookie-settings opens the preferences
   document.addEventListener('click', (event) => {
-    if ((event.target as Element).closest('[data-cookie-settings]')) open(true);
-  });
+    if ((event.target as Element).closest('[data-cookie-settings]')) open(true)
+  })
 
-  if (!getConsent()) open();
+  if (!getConsent()) open()
 </script>
 
 <style>

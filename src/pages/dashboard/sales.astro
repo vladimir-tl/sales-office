@@ -1,7 +1,7 @@
 ---
-import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import ResourceView from '../../components/ResourceView.astro';
-import type { Column } from '../../lib/api';
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import ResourceView from '../../components/ResourceView.astro'
+import type { Column } from '../../lib/api'
 
 const columns: Column[] = [
   { key: 'id', label: 'ID' },
@@ -11,7 +11,7 @@ const columns: Column[] = [
   { key: 'quantity', label: 'Qty', format: 'number' },
   { key: 'amount', label: 'Amount', format: 'money' },
   { key: 'status', label: 'Status', format: 'status' },
-];
+]
 ---
 
 <DashboardLayout title="Sales">

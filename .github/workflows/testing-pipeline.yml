@@ -28,11 +28,11 @@ jobs:
       # Fail fast on formatting before spending time on browsers and tests
       - run: npm run format:check
 
-      - run: npx playwright install --with-deps chromium
+      - run: npm run test:install
 
       # The app runs in the background for the rest of the job; logs go to astro-dev.log
       - name: Start app on localhost:4322
-        run: nohup npx astro dev --port 4322 --strictPort > astro-dev.log 2>&1 &
+        run: nohup npm run test:server > astro-dev.log 2>&1 &
 
       - name: Wait for app
         run: |

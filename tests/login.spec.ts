@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { acceptCookies } from './helpers'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
+import { mockLoginSuccess, mockNoSales } from './mocks/api'
 
 test.describe('Login', { tag: '@login' }, () => {
   let login: LoginPage
@@ -25,9 +26,11 @@ test.describe('Login', { tag: '@login' }, () => {
     await expect(login.error).toBeVisible()
   })
 
-  // Skipped until the login token is mocked; then it won't need the real backend
-  test.skip('logs in with real credentials', async ({ page }) => {
-    await login.login(process.env.LOGIN_USER!, process.env.LOGIN_PASS!)
+  // Login and data are mocked, so no real backend or credentials are needed
+  test('logs in with a mocked token', async ({ page }) => {
+    await mockLoginSuccess(page, 'demo-user')
+    await mockNoSales(page) // the dashboard opens on Sales; a fake token would get 401 from the real API
+    await login.login('demo-user', 'secret123')
 
     await expect(new DashboardPage(page).sidebar).toBeVisible()
   })

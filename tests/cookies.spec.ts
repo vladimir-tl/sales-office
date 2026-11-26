@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { acceptCookies } from './helpers'
+import { imitateAcceptedCookie } from './helpers'
 import { LoginPage } from './pages/LoginPage'
 
 test('shows the cookie dialog without cookie_consent', async ({ page }) => {
@@ -12,7 +12,7 @@ test('hides the cookie dialog with cookie_consent and keeps the login form usabl
   page,
 }) => {
   const login = new LoginPage(page)
-  await acceptCookies(page)
+  await imitateAcceptedCookie(page)
   await login.goto()
 
   await expect(login.cookieDialog.dialog).toBeHidden()

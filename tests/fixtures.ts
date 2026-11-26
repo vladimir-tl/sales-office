@@ -1,5 +1,5 @@
 import { test as base, expect } from '@playwright/test'
-import { acceptCookies } from './helpers'
+import { imitateAcceptedCookie } from './helpers'
 import { LoginPage } from './pages/LoginPage'
 
 type Fixtures = {
@@ -10,7 +10,7 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
   loginPageWithCookies: async ({ page }, use) => {
     const login = new LoginPage(page)
-    await acceptCookies(page)
+    await imitateAcceptedCookie(page)
     await login.goto()
     await expect(login.cookieDialog.dialog).toBeHidden()
 

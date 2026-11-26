@@ -29,7 +29,19 @@ jobs:
 
       - run: npx playwright install --with-deps chromium
 
-      # BASE_URL is not set, so playwright.config.ts starts `astro dev` on localhost:4322.
+      # The app runs in the background for the rest of the job; logs go to astro-dev.log
+      - name: Start app on localhost:4322
+        run: nohup npx astro dev --port 4322 --strictPort > astro-dev.log 2>&1 &
+
+      - name: Wait for app
+        run: |
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:4322 && echo "App is up" && exit 0
+            sleep 2
+          done
+          echo "App did not start in 120 s"; cat astro-dev.log; exit 1
+
+      # BASE_URL is not set, so tests go to http://localhost:4322.
       # Login-page tests only (@login) for now: they don't need a real backend login
       - run: npm run test:login
 
@@ -40,4 +52,5 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            astro-dev.log
           retention-days: 14

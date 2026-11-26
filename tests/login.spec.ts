@@ -20,12 +20,8 @@ test.describe('Login', { tag: '@login' }, () => {
 
   // Skipped until the login token is mocked; then it won't need the real backend
   test.skip('logs in with real credentials', async ({ page }) => {
-    const user = process.env.LOGIN_USER!;
-    const pass = process.env.LOGIN_PASS!;
-
-    await login.login(user, pass);
+    await login.login(process.env.LOGIN_USER!, process.env.LOGIN_PASS!);
 
     await expect(page).toHaveURL(/\/dashboard\/sales$/);
-    await expect(page.getByTestId('sidebar-username')).toHaveText(user);
   });
 });

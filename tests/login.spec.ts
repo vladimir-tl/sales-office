@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { acceptCookies } from './helpers';
+import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
 
 test.describe('Login', { tag: '@login' }, () => {
@@ -28,6 +29,6 @@ test.describe('Login', { tag: '@login' }, () => {
   test.skip('logs in with real credentials', async ({ page }) => {
     await login.login(process.env.LOGIN_USER!, process.env.LOGIN_PASS!);
 
-    await expect(page).toHaveURL(/\/dashboard\/sales$/);
+    await expect(new DashboardPage(page).sidebar).toBeVisible();
   });
 });

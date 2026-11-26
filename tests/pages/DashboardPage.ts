@@ -4,6 +4,7 @@ import { SessionDialog } from './SessionDialog';
 export class DashboardPage {
   readonly sessionDialog: SessionDialog;
   readonly root: Locator;
+  readonly sidebar: Locator;
   readonly username: Locator;
   readonly logout: Locator;
   readonly salesNav: Locator;
@@ -14,6 +15,7 @@ export class DashboardPage {
   constructor(readonly page: Page) {
     this.sessionDialog = new SessionDialog(page);
     this.root = page.getByTestId('dashboard');
+    this.sidebar = page.getByTestId('sidebar');
     this.username = page.getByTestId('sidebar-username');
     this.logout = page.getByTestId('logout-button');
     this.salesNav = page.getByTestId('nav-sales');

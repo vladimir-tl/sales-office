@@ -1,6 +1,6 @@
 ---
 // Same-origin proxy (src/pages/api/login/auth.ts) forwards to the backend POST /login/student
-const endpoint = '/api/login/auth';
+const endpoint = '/api/login/auth'
 ---
 
 <div class="login">
@@ -74,92 +74,92 @@ const endpoint = '/api/login/auth';
 </div>
 
 <script>
-  import { decodeJwt, validToken, writeToken } from '../lib/auth';
+  import { decodeJwt, validToken, writeToken } from '../lib/auth'
 
-  const DASHBOARD_URL = '/dashboard';
+  const DASHBOARD_URL = '/dashboard'
 
   // Already logged in with a valid token — go straight to the dashboard
-  if (validToken()) location.replace(DASHBOARD_URL);
+  if (validToken()) location.replace(DASHBOARD_URL)
 
-  const form = document.getElementById('login-form') as HTMLFormElement;
-  const errorBox = document.getElementById('login-error') as HTMLParagraphElement;
-  const submit = document.getElementById('login-submit') as HTMLButtonElement;
-  const username = form.elements.namedItem('username') as HTMLInputElement;
-  const password = form.elements.namedItem('password') as HTMLInputElement;
-  const toggle = document.getElementById('toggle-password') as HTMLButtonElement;
-  const endpoint = form.dataset.endpoint!;
+  const form = document.getElementById('login-form') as HTMLFormElement
+  const errorBox = document.getElementById('login-error') as HTMLParagraphElement
+  const submit = document.getElementById('login-submit') as HTMLButtonElement
+  const username = form.elements.namedItem('username') as HTMLInputElement
+  const password = form.elements.namedItem('password') as HTMLInputElement
+  const toggle = document.getElementById('toggle-password') as HTMLButtonElement
+  const endpoint = form.dataset.endpoint!
 
   class LoginError extends Error {}
 
   function showError(message: string) {
-    errorBox.textContent = message;
-    errorBox.hidden = false;
-    form.classList.add('is-invalid');
+    errorBox.textContent = message
+    errorBox.hidden = false
+    form.classList.add('is-invalid')
   }
 
   function clearError() {
-    errorBox.hidden = true;
-    form.classList.remove('is-invalid');
+    errorBox.hidden = true
+    form.classList.remove('is-invalid')
   }
 
   function setLoading(loading: boolean) {
-    submit.disabled = loading;
-    submit.classList.toggle('is-loading', loading);
-    submit.setAttribute('aria-busy', String(loading));
+    submit.disabled = loading
+    submit.classList.toggle('is-loading', loading)
+    submit.setAttribute('aria-busy', String(loading))
   }
 
   toggle.addEventListener('click', () => {
-    const show = password.type === 'password';
-    password.type = show ? 'text' : 'password';
-    toggle.setAttribute('aria-pressed', String(show));
-    toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-  });
+    const show = password.type === 'password'
+    password.type = show ? 'text' : 'password'
+    toggle.setAttribute('aria-pressed', String(show))
+    toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password')
+  })
 
-  form.addEventListener('input', clearError);
+  form.addEventListener('input', clearError)
 
   form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    clearError();
+    event.preventDefault()
+    clearError()
 
-    const user = username.value.trim();
-    const pass = password.value;
+    const user = username.value.trim()
+    const pass = password.value
     if (!user || !pass) {
-      showError('Enter your username and password');
-      (user ? password : username).focus();
-      return;
+      showError('Enter your username and password')
+      ;(user ? password : username).focus()
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', accept: 'text/plain' },
         body: JSON.stringify({ username: user, password: pass }),
-      });
+      })
 
       if (res.status === 401 || res.status === 403) {
-        throw new LoginError('Incorrect username or password');
+        throw new LoginError('Incorrect username or password')
       }
       if (!res.ok) {
         throw new LoginError(
           `Something went wrong on our side (${res.status}). Please try again later.`,
-        );
+        )
       }
 
-      const token = (await res.text()).trim();
-      if (!token || !decodeJwt(token)) throw new LoginError('No token received. Please try again.');
+      const token = (await res.text()).trim()
+      if (!token || !decodeJwt(token)) throw new LoginError('No token received. Please try again.')
 
-      writeToken(token);
-      location.assign(DASHBOARD_URL);
+      writeToken(token)
+      location.assign(DASHBOARD_URL)
     } catch (err) {
       showError(
         err instanceof LoginError
           ? err.message
           : "Couldn't reach the server. Check your internet connection.",
-      );
-      setLoading(false);
+      )
+      setLoading(false)
     }
-  });
+  })
 </script>
 
 <style>

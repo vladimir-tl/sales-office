@@ -1,13 +1,13 @@
 ---
-import Layout from './Layout.astro';
-import SessionTimeout from '../components/SessionTimeout.astro';
+import Layout from './Layout.astro'
+import SessionTimeout from '../components/SessionTimeout.astro'
 
 interface Props {
-  title: string;
+  title: string
 }
 
-const { title } = Astro.props;
-const path = Astro.url.pathname.replace(/\/$/, '');
+const { title } = Astro.props
+const path = Astro.url.pathname.replace(/\/$/, '')
 
 const nav = [
   {
@@ -22,26 +22,26 @@ const nav = [
     testid: 'nav-products',
     icon: 'M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Zm0 2.2 6.3 3.1L12 10.5 5.7 7.3 12 4.2ZM5 9l6 3v7.7l-6-3V9Zm8 10.7V12l6-3v7.7l-6 3Z',
   },
-];
+]
 ---
 
 <Layout title={`${title} — Sales Office`}>
   <script is:inline>
     // Auth guard: runs before the page renders, so a logged-out visitor never sees the dashboard
-    (function () {
+    ;(function () {
       try {
-        var t = localStorage.getItem('auth_token');
+        var t = localStorage.getItem('auth_token')
         var exp = t
           ? JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp
-          : 0;
+          : 0
         if (!t || (exp && exp * 1000 <= Date.now())) {
-          localStorage.removeItem('auth_token');
-          location.replace('/');
+          localStorage.removeItem('auth_token')
+          location.replace('/')
         }
       } catch (e) {
-        location.replace('/');
+        location.replace('/')
       }
-    })();
+    })()
   </script>
 
   <div class="app" data-testid="dashboard">
@@ -94,16 +94,16 @@ const nav = [
 </Layout>
 
 <script>
-  import { decodeJwt, readToken, writeToken } from '../lib/auth';
+  import { decodeJwt, readToken, writeToken } from '../lib/auth'
 
-  const name = decodeJwt(readToken() ?? '')?.sub ?? '';
-  document.getElementById('user-name')!.textContent = name;
-  document.getElementById('user-avatar')!.textContent = name.slice(0, 1).toUpperCase() || '?';
+  const name = decodeJwt(readToken() ?? '')?.sub ?? ''
+  document.getElementById('user-name')!.textContent = name
+  document.getElementById('user-avatar')!.textContent = name.slice(0, 1).toUpperCase() || '?'
 
   document.getElementById('logout')!.addEventListener('click', () => {
-    writeToken(null);
-    location.replace('/');
-  });
+    writeToken(null)
+    location.replace('/')
+  })
 </script>
 
 <style>

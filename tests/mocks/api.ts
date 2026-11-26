@@ -1,5 +1,5 @@
-import type { Page } from '@playwright/test';
-import type { Product, Sale } from '../../src/lib/api';
+import type { Page } from '@playwright/test'
+import type { Product, Sale } from '../../src/lib/api'
 
 /** Simple mocks for the data API, shaped by contracts/openapi.yaml */
 
@@ -35,7 +35,7 @@ const threeSales: Sale[] = [
     currency: 'EUR',
     status: 'cancelled',
   },
-];
+]
 
 /** 4 products (contract example `some` + two more) */
 const fourProducts: Product[] = [
@@ -75,18 +75,18 @@ const fourProducts: Product[] = [
     stock: 1000,
     active: true,
   },
-];
+]
 
 // ---- One named mock per scenario ----
 
 /** GET /api/sales → 200, 3 sales */
 export const mockThreeSales = (page: Page) =>
-  page.route('**/api/sales', (route) => route.fulfill({ json: threeSales }));
+  page.route('**/api/sales', (route) => route.fulfill({ json: threeSales }))
 
 /** GET /api/sales → 200, [] (no sales) */
 export const mockNoSales = (page: Page) =>
-  page.route('**/api/sales', (route) => route.fulfill({ json: [] }));
+  page.route('**/api/sales', (route) => route.fulfill({ json: [] }))
 
 /** GET /api/products → 200, 4 products */
 export const mockFourProducts = (page: Page) =>
-  page.route('**/api/products', (route) => route.fulfill({ json: fourProducts }));
+  page.route('**/api/products', (route) => route.fulfill({ json: fourProducts }))

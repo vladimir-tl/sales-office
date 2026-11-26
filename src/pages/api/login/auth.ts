@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro'
 
 /**
  * Same-origin proxy for login: the browser calls POST /api/login/auth
@@ -7,13 +7,13 @@ import type { APIRoute } from 'astro';
 const BACKEND = (import.meta.env.PUBLIC_API_URL || 'https://backend.tallinn-learning.ee').replace(
   /\/$/,
   '',
-);
-const UPSTREAM = `${BACKEND}/login/student`;
+)
+const UPSTREAM = `${BACKEND}/login/student`
 
-export const prerender = false;
+export const prerender = false
 
 export const POST: APIRoute = async ({ request }) => {
-  let upstream: Response;
+  let upstream: Response
   try {
     upstream = await fetch(UPSTREAM, {
       method: 'POST',
@@ -22,16 +22,16 @@ export const POST: APIRoute = async ({ request }) => {
         Accept: request.headers.get('accept') ?? '*/*',
       },
       body: await request.text(),
-    });
+    })
   } catch {
     return new Response(JSON.stringify({ message: 'Login service is unreachable' }), {
       status: 502,
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
   }
 
-  const headers = new Headers({ 'Cache-Control': 'no-store' });
-  const type = upstream.headers.get('content-type');
-  if (type) headers.set('Content-Type', type);
-  return new Response(await upstream.text(), { status: upstream.status, headers });
-};
+  const headers = new Headers({ 'Cache-Control': 'no-store' })
+  const type = upstream.headers.get('content-type')
+  if (type) headers.set('Content-Type', type)
+  return new Response(await upstream.text(), { status: upstream.status, headers })
+}

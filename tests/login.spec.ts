@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { acceptCookies } from './helpers'
+import { imitateAcceptedCookie } from './helpers'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { mockLoginSuccess, mockNoSales } from './mocks/api'
@@ -9,7 +9,7 @@ test.describe('Login', { tag: '@login' }, () => {
 
   test.beforeEach(async ({ page }) => {
     login = new LoginPage(page)
-    await acceptCookies(page)
+    await imitateAcceptedCookie(page)
     await login.goto()
     await expect(login.cookieDialog.dialog).toBeHidden()
   })

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { acceptCookies } from './helpers'
+import { imitateAcceptedCookie } from './helpers'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { mockLoginSuccess, mockNoSales } from './mocks/api'
@@ -14,7 +14,7 @@ test.describe('Session expiry dialog', () => {
   test.beforeEach(async ({ page }) => {
     dashboard = new DashboardPage(page)
     const login = new LoginPage(page)
-    await acceptCookies(page)
+    await imitateAcceptedCookie(page)
     await mockLoginSuccess(page)
     await mockNoSales(page) // answer right away
     await login.goto()

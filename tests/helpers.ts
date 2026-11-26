@@ -6,7 +6,7 @@ import { CONSENT_KEY, CONSENT_VERSION } from '../src/lib/consent'
  * had already clicked "Accept all", so the dialog doesn't appear on load.
  * Call it before page.goto().
  */
-export async function acceptCookies(page: Page) {
+export async function imitateAcceptedCookie(page: Page) {
   const consent = {
     version: CONSENT_VERSION,
     necessary: true,

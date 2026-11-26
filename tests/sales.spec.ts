@@ -1,20 +1,29 @@
 import { test, expect } from '@playwright/test'
-import { acceptCookies } from './helpers'
+import { imitateAcceptedCookie } from './helpers'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { mockLoginSuccess, mockThreeSales } from './mocks/api'
 
-test('Sales: shows 3 sales from GET /sales', async ({ page }) => {
-  const login = new LoginPage(page)
-  const dashboard = new DashboardPage(page)
-  await acceptCookies(page)
-  await mockLoginSuccess(page)
-  await mockThreeSales(page)
+test.describe('Sales', { tag: '@sales' }, () => {
+  let login: LoginPage
+  let dashboard: DashboardPage
 
-  await login.goto()
-  await login.login('demo-user', 'secret123')
-  await expect(page).toHaveURL(/\/dashboard\/sales$/)
-  await dashboard.gotoSales()
+  test.beforeEach(async ({ page }) => {
+    login = new LoginPage(page)
+    dashboard = new DashboardPage(page)
+    await imitateAcceptedCookie(page)
+    await mockLoginSuccess(page)
+    // Mock sales before logging in: the dashboard opens on Sales right after login
+    await mockThreeSales(page)
 
-  await expect(page.getByTestId('sales-row')).toHaveCount(3)
+    await login.goto()
+    await login.login('demo-user', 'secret123')
+    await expect(page).toHaveURL(/\/dashboard\/sales$/)
+  })
+
+  test('shows 3 sales from GET /sales', async ({ page }) => {
+    await dashboard.gotoSales()
+
+    await expect(page.getByTestId('sales-row')).toHaveCount(3)
+  })
 })

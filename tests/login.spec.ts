@@ -18,6 +18,26 @@ test.describe('Login', { tag: '@login' }, () => {
     expect((await request).method()).toBe('POST');
   });
 
+  // Client-side validation: the form shows an error and never calls the backend
+  for (const { name, username, password } of [
+    { name: 'both fields empty', username: '', password: '' },
+    { name: 'password empty', username: 'demo-user', password: '' },
+    { name: 'username empty', username: '', password: 'secret123' },
+  ]) {
+    test(`shows an error and sends no request when ${name}`, async ({ page }) => {
+      let requested = false;
+      await page.route(LoginPage.LOGIN_ROUTE, (route) => {
+        requested = true;
+        return route.abort();
+      });
+
+      await login.login(username, password);
+
+      await expect(login.error).toBeVisible();
+      expect(requested).toBe(false);
+    });
+  }
+
   // Skipped until the login token is mocked; then it won't need the real backend
   test.skip('logs in with real credentials', async ({ page }) => {
     await login.login(process.env.LOGIN_USER!, process.env.LOGIN_PASS!);
